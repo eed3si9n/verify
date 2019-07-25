@@ -19,27 +19,6 @@ libraryDependencies += "io.monix" %% "minitest" % "2.5.0" % "test"
 testFrameworks += new TestFramework("minitest.runner.Framework")
 ```
 
-In case you want the optional package for integration with the latest
-[ScalaCheck](https://www.scalacheck.org/), at the moment of writing
-this being version `1.14.0`:
-
-```scala
-// use the %%% operator for Scala.js
-libraryDependencies += "io.monix" %% "minitest-laws" % "2.5.0" % "test"
-```
-
-Given that updates for ScalaCheck have been problematic, the ecosystem
-being at the moment of writing using an older version, a "legacy" package
-is currently provided for usage with ScalaCheck `1.13.5`:
-
-```scala
-// use the %%% operator for Scala.js
-libraryDependencies += "io.monix" %% "minitest-laws-legacy" % "2.5.0" % "test"
-```
-
-Note that at this time the laws package is not available for Scala
-Native, due to ScalaCheck not being available for it.
-
 ## Tutorial
 
 Test suites MUST BE objects, not classes. To create a simple test suite, it could

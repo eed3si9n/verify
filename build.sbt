@@ -151,7 +151,7 @@ lazy val requiredMacroCompatDeps = Seq(
 )
 
 lazy val minitestRoot = project.in(file("."))
-  .aggregate(minitestJVM, minitestJS, lawsJVM, lawsJS, lawsLegacyJVM, lawsLegacyJS)
+  .aggregate(minitestJVM, minitestJS)
   .settings(
     name := "minitest root",
     Compile / sources := Nil,
@@ -195,53 +195,3 @@ lazy val minitest = crossProject(JVMPlatform, JSPlatform, NativePlatform).in(fil
 lazy val minitestJVM    = minitest.jvm
 lazy val minitestJS     = minitest.js
 lazy val minitestNative = minitest.native
-
-lazy val laws = crossProject(JVMPlatform, JSPlatform).in(file("laws"))
-  .dependsOn(minitest)
-  .settings(
-    name := "minitest-laws",
-    sharedSettings,
-    crossVersionSharedSources,
-    libraryDependencies ++= Seq(
-      "org.scalacheck" %%% "scalacheck" % "1.14.0"
-    )
-  )
-  .jsSettings(
-    scalaJSSettings
-  )
-
-lazy val lawsJVM    = laws.jvm
-lazy val lawsJS     = laws.js
-
-val LegacyScalaCheckVersion = Def.setting {
-  CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, v)) if v <= 12 =>
-      "1.13.5"
-    case _ =>
-      "1.14.0"
-  }
-}
-
-lazy val lawsLegacy = crossProject(JVMPlatform, JSPlatform)
-  .in(file("laws-legacy"))
-  .dependsOn(minitest)
-  .settings(
-    name := "minitest-laws-legacy",
-    sharedSettings,
-    crossVersionSharedSources,
-    libraryDependencies ++= Seq(
-      "org.scalacheck" %%% "scalacheck" % LegacyScalaCheckVersion.value
-    ),
-    unmanagedSourceDirectories in Compile += {
-      baseDirectory.value.getParentFile / ".." / "laws" / "shared" / "src" / "main" / "scala"
-    },
-    unmanagedSourceDirectories in Test += {
-      baseDirectory.value.getParentFile / ".." / "laws" / "shared" / "src" / "test" / "scala"
-    }
-  )
-  .jsSettings(
-    scalaJSSettings
-  )
-
-lazy val lawsLegacyJVM = lawsLegacy.jvm
-lazy val lawsLegacyJS  = lawsLegacy.js
