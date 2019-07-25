@@ -1,13 +1,14 @@
 nanotest-strawman
 =================
 
+This is a fork of [Minitest](https://github.com/monix/minitest) to prepare for eventual merge into scala/scala.
+The purpose of nanotest-strawman is to create a cross-platform, zero-dependency, minimal, testing framework for bootstrapping the toolchain and a small handful of foundational third-party libraries. See https://github.com/scala/scala-dev/issues/641.
+
 A mini testing framework cross-compiled for Scala 2.10, 2.11, 2.12,
 2.13, [Scala.js 0.6.x](http://www.scala-js.org/) and
 [Scala Native 0.3.x](https://www.scala-native.org/).
 
-[![CircleCI](https://circleci.com/gh/monix/minitest.svg?style=svg)](https://circleci.com/gh/monix/minitest)
-
-## Usage in SBT
+## Usage in sbt
 
 For `build.sbt` (use the `%%%` operator for Scala.js):
 
