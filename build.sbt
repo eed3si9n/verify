@@ -33,7 +33,7 @@ ThisBuild / crossScalaVersions := Seq(Scala211, "2.12.8", "2.13.0")
 
 def scalaPartV = Def setting (CrossVersion partialVersion scalaVersion.value)
 lazy val crossVersionSharedSources: Seq[Setting[_]] =
-  Seq(Compile, Test).map { sc =>
+  (Seq(Compile, Test).map { sc =>
     (unmanagedSourceDirectories in sc) ++= {
       (unmanagedSourceDirectories in sc).value.map { dir =>
         scalaPartV.value match {
@@ -44,7 +44,15 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
         }
       }
     }
-  }
+  }) ++ Seq(
+    Compile / unmanagedSourceDirectories := {
+      val crossVer = CrossVersion.partialVersion(scalaVersion.value)
+      crossVer match {
+        case Some((2, _)) => List(baseDirectory.value.getParentFile / "shared" / "src" / "main" / "scala-2")
+        case _            => List(baseDirectory.value.getParentFile / "shared" / "src" / "main" / "scala-3")
+      }
+    }
+  )
 
 lazy val scalaLinterOptions =
   Seq(
