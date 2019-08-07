@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package minitest
+package cutest
 
 import org.portablescala.reflect.Reflect
 
@@ -70,7 +70,7 @@ package object platform {
   type EnableReflectiveInstantiation =
     org.portablescala.reflect.annotation.EnableReflectiveInstantiation
 
-  private[minitest] def loadModule(name: String, loader: ClassLoader): Any = {
+  private[cutest] def loadModule(name: String, loader: ClassLoader): Any = {
     Reflect
       .lookupLoadableModuleClass(name + "$", loader)
       .getOrElse(throw new ClassNotFoundException(name))

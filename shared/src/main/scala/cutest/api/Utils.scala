@@ -15,20 +15,13 @@
  * limitations under the License.
  */
 
-package cutest
-package platform
+package cutest.api
 
-import scala.concurrent.duration.Duration
+import scala.util.control.NonFatal
 
-/**
-  * Stub needed because Scala Native does not provide an
-  * implementation for [[scala.concurrent.Await]] yet.
-  *
-  * Note that this isn't a proper `Await` implementation,
-  * just something very simple for compilation to work and
-  * to pass the current tests.
-  */
-object Await {
-  def result[A](future: Future[A], duration: Duration): A =
-    future.value.get
+object Utils {
+  def silent[T](cb: => T): Unit =
+    try { cb; () } catch {
+      case NonFatal(_) => ()
+    }
 }

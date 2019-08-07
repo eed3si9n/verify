@@ -27,6 +27,7 @@ addCommandAlias("ci-all",  ";+clean ;+test:compile ;+test ;+package")
 addCommandAlias("release", ";+clean ;+minitestNative/clean ;+publishSigned ;+minitestNative/publishSigned")
 
 val Scala211 = "2.11.12"
+val Scala3 = "0.17.0-RC1"
 
 ThisBuild / scalaVersion := "2.12.8"
 ThisBuild / crossScalaVersions := Seq(Scala211, "2.12.8", "2.13.0")
@@ -45,11 +46,11 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
       }
     }
   }) ++ Seq(
-    Compile / unmanagedSourceDirectories := {
+    Compile / unmanagedSourceDirectories += {
       val crossVer = CrossVersion.partialVersion(scalaVersion.value)
       crossVer match {
-        case Some((2, _)) => List(baseDirectory.value.getParentFile / "shared" / "src" / "main" / "scala-2")
-        case _            => List(baseDirectory.value.getParentFile / "shared" / "src" / "main" / "scala-3")
+        case Some((2, _)) => baseDirectory.value.getParentFile / "shared" / "src" / "main" / "scala-2"
+        case _            => baseDirectory.value.getParentFile / "shared" / "src" / "main" / "scala-3"
       }
     }
   )
@@ -123,7 +124,7 @@ lazy val sharedSettings = Seq(
     Resolver.sonatypeRepo("releases")
   ),
 
-  testFrameworks := Seq(new TestFramework("minitest.runner.Framework"))
+  testFrameworks := Seq(new TestFramework("cutest.runner.Framework"))
 )
 
 lazy val scalaJSSettings = Seq(
@@ -140,21 +141,16 @@ lazy val nativeSettings = Seq(
 lazy val needsScalaParadise = settingKey[Boolean]("Needs Scala Paradise")
 
 lazy val requiredMacroCompatDeps = Seq(
-  needsScalaParadise := {
-    val sv = scalaVersion.value
-    (sv startsWith "2.11.") || (sv startsWith "2.12.") || (sv == "2.13.0-M3")
-  },
-  libraryDependencies ++= Seq(
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value % Compile,
-    "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided,
-  ),
   libraryDependencies ++= {
-    if (needsScalaParadise.value) Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch))
-    else Nil
-  },
-  scalacOptions ++= {
-    if (needsScalaParadise.value) Nil
-    else Seq("-Ymacro-annotations")
+    val crossVer = CrossVersion.partialVersion(scalaVersion.value)
+    crossVer match {
+      case Some((2, _)) =>
+        List(
+          "org.scala-lang" % "scala-reflect" % scalaVersion.value % Compile,
+          "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided
+        )
+      case _ => Nil
+    }
   }
 )
 
@@ -174,6 +170,7 @@ lazy val minitest = crossProject(JVMPlatform, JSPlatform, NativePlatform).in(fil
     requiredMacroCompatDeps
   )
   .jvmSettings(
+    crossScalaVersions += Scala3,
     libraryDependencies ++= Seq(
       "org.scala-sbt" % "test-interface" % "1.0"
     ),

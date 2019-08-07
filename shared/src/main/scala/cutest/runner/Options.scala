@@ -15,20 +15,20 @@
  * limitations under the License.
  */
 
-package cutest
-package platform
-
-import scala.concurrent.duration.Duration
+package cutest.runner
 
 /**
-  * Stub needed because Scala Native does not provide an
-  * implementation for [[scala.concurrent.Await]] yet.
+  * Configurable options for the runner.
   *
-  * Note that this isn't a proper `Await` implementation,
-  * just something very simple for compilation to work and
-  * to pass the current tests.
+  * @param useSbtLogging specifies whether to use SBT's test-logging infrastructure,
+  *        or just println.
+  *
+  *        Defaults to `println` because SBT's test logging doesn't seem to give us
+  *        anything that we want, and does annoying things like making a left-hand
+  *        gutter and buffering input by default.
+  *
+  *        Option inspired by its availability in uTest and other testing frameworks.
   */
-object Await {
-  def result[A](future: Future[A], duration: Duration): A =
-    future.value.get
-}
+final case class Options(
+  useSbtLogging: Boolean = false
+)

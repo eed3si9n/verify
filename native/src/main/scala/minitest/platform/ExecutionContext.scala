@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package minitest
+package cutest
 package platform
 
 /**

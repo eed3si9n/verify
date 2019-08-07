@@ -15,20 +15,36 @@
  * limitations under the License.
  */
 
-package cutest
-package platform
+package example.tests
 
-import scala.concurrent.duration.Duration
+import cutest.TestSuite
+import cutest.platform.Future
+import scala.util.Random
 
-/**
-  * Stub needed because Scala Native does not provide an
-  * implementation for [[scala.concurrent.Await]] yet.
-  *
-  * Note that this isn't a proper `Await` implementation,
-  * just something very simple for compilation to work and
-  * to pass the current tests.
-  */
-object Await {
-  def result[A](future: Future[A], duration: Duration): A =
-    future.value.get
+object EnvironmentTest extends TestSuite[Int] {
+  def setup(): Int = {
+    Random.nextInt(100) + 1
+  }
+
+  def tearDown(env: Int): Unit = {
+    assert(env > 0)
+  }
+
+  override def setupSuite() = {
+  }
+
+  override def tearDownSuite() = {
+  }
+
+  test("simple test") { env =>
+    assertEquals(env, env)
+  }
+
+  testAsync("asynchronous test") { env =>
+    import cutest.platform.ExecutionContext.Implicits.global
+
+    Future(env).map(_+1).map { result =>
+      assertEquals(result, env+1)
+    }
+  }
 }

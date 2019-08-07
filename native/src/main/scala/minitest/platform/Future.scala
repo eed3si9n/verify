@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package minitest
+package cutest
 package platform
 
 import scala.util.{Failure, Success, Try}
@@ -28,7 +28,7 @@ import scala.util.{Failure, Success, Try}
   * just something very simple for compilation to work and
   * to pass the current tests.
   */
-final class Future[+A] private[minitest] (private[minitest] val value: Try[A]) {
+final class Future[+A] private[cutest] (private[cutest] val value: Try[A]) {
   def map[B](f: A => B)(implicit executor: ExecutionContext): Future[B] =
     new Future(value.map(f))
 

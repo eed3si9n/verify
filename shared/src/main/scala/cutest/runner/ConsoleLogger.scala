@@ -15,20 +15,24 @@
  * limitations under the License.
  */
 
-package cutest
-package platform
+package cutest.runner
 
-import scala.concurrent.duration.Duration
+import sbt.testing.Logger
 
-/**
-  * Stub needed because Scala Native does not provide an
-  * implementation for [[scala.concurrent.Await]] yet.
-  *
-  * Note that this isn't a proper `Await` implementation,
-  * just something very simple for compilation to work and
-  * to pass the current tests.
-  */
-object Await {
-  def result[A](future: Future[A], duration: Duration): A =
-    future.value.get
+final class ConsoleLogger extends Logger {
+  private[this] val withColors =
+    System.getenv().get("TERM") != null
+
+  def ansiCodesSupported(): Boolean =
+    withColors
+  def error(msg: String): Unit =
+    print(msg)
+  def warn(msg: String): Unit =
+    print(msg)
+  def info(msg: String): Unit =
+    print(msg)
+  def debug(msg: String): Unit =
+    print(msg)
+  def trace(t: Throwable): Unit =
+    t.printStackTrace(System.out)
 }
