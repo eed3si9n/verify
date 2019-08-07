@@ -1,18 +1,13 @@
 /*
- * Copyright (c) 2014-2019 by The Minitest Project Developers.
- * Some rights reserved.
+ * Scala (https://www.scala-lang.org)
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright EPFL and Lightbend, Inc.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under Apache License 2.0
+ * (http://www.apache.org/licenses/LICENSE-2.0).
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
  */
 
 import sbt._
@@ -31,6 +26,25 @@ val Scala3 = "0.17.0-RC1"
 
 ThisBuild / scalaVersion := "2.12.8"
 ThisBuild / crossScalaVersions := Seq(Scala211, "2.12.8", "2.13.0")
+
+ThisBuild / organization := "com.eed3si9n.cutest"
+ThisBuild / homepage := Some(url("https://www.scala-lang.org"))
+ThisBuild / startYear := Some(2002)
+ThisBuild / licenses += (("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0")))
+ThisBuild / headerLicense := Some(
+  HeaderLicense.Custom(
+    s"""Scala (${(ThisBuild / homepage).value.get})
+     |
+     |Copyright EPFL and Lightbend, Inc.
+     |
+     |Licensed under Apache License 2.0
+     |(http://www.apache.org/licenses/LICENSE-2.0).
+     |
+     |See the NOTICE file distributed with this work for
+     |additional information regarding copyright ownership.
+     |""".stripMargin
+  )
+)
 
 def scalaPartV = Def setting (CrossVersion partialVersion scalaVersion.value)
 lazy val crossVersionSharedSources: Seq[Setting[_]] =
@@ -124,7 +138,8 @@ lazy val sharedSettings = Seq(
     "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases",
     Resolver.sonatypeRepo("releases")
   ),
-  testFrameworks := Seq(new TestFramework("cutest.runner.Framework"))
+  testFrameworks := Seq(new TestFramework("cutest.runner.Framework")),
+  headerLicense := (ThisBuild / headerLicense).value
 )
 
 lazy val scalaJSSettings = Seq(
