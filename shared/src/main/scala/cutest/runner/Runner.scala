@@ -1,0 +1,39 @@
+/*
+ * Scala (https://www.scala-lang.org)
+ *
+ * Copyright EPFL and Lightbend, Inc.
+ *
+ * Licensed under Apache License 2.0
+ * (http://www.apache.org/licenses/LICENSE-2.0).
+ *
+ * See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
+ */
+
+package cutest.runner
+
+import sbt.testing.{ Runner => BaseRunner, Task => BaseTask, _ }
+
+final class Runner(
+    val args: Array[String],
+    val remoteArgs: Array[String],
+    val options: Options,
+    classLoader: ClassLoader
+) extends BaseRunner {
+
+  def done(): String = ""
+
+  def tasks(list: Array[TaskDef]): Array[BaseTask] = {
+    list.map(t => new Task(t, options, classLoader))
+  }
+
+  def receiveMessage(msg: String): Option[String] = {
+    None
+  }
+
+  def serializeTask(task: BaseTask, serializer: TaskDef => String): String =
+    serializer(task.taskDef())
+
+  def deserializeTask(task: String, deserializer: String => TaskDef): BaseTask =
+    new Task(deserializer(task), options, classLoader)
+}

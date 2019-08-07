@@ -141,6 +141,4 @@ That's all you need to know.
 ## License
 
 All code in this repository is licensed under the Apache License, Version 2.0.
-See [LICENCE](./LICENSE).
-
-Copyright &copy; 2014-2018 by The Minitest Project Developers.
+See [NOTICE](./NOTICE).

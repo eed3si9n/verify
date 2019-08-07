@@ -15,14 +15,34 @@
  * limitations under the License.
  */
 
-package cutest
+package example.tests
 
-import scala.scalanative.testinterface.PreloadedClassLoader
+import cutest.TestSuite
+import cutest.platform.Future
+import scala.util.Random
 
-package object platform {
-  type EnableReflectiveInstantiation =
-    scala.scalajs.reflect.annotation.EnableReflectiveInstantiation
+object EnvironmentTest extends TestSuite[Int] {
+  def setup(): Int = {
+    Random.nextInt(100) + 1
+  }
 
-  private[cutest] def loadModule(name: String, loader: ClassLoader): Any =
-    loader.asInstanceOf[PreloadedClassLoader].loadPreloaded(name)
+  def tearDown(env: Int): Unit = {
+    assert(env > 0)
+  }
+
+  override def setupSuite() = {}
+
+  override def tearDownSuite() = {}
+
+  test("simple test") { env =>
+    assertEquals(env, env)
+  }
+
+  testAsync("asynchronous test") { env =>
+    import cutest.platform.ExecutionContext.Implicits.global
+
+    Future(env).map(_ + 1).map { result =>
+      assertEquals(result, env + 1)
+    }
+  }
 }

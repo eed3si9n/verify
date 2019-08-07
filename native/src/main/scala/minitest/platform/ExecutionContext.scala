@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-package minitest
+package cutest
 package platform
 
 /**
-  * Stub needed because Scala Native does not provide an
-  * implementation for [[scala.concurrent.ExecutionContext]] yet.
-  *
-  * Note that this isn't a proper `ExecutionContext` implementation,
-  * just something very simple for compilation to work and
-  * to pass the current tests.
-  */
+ * Stub needed because Scala Native does not provide an
+ * implementation for [[scala.concurrent.ExecutionContext]] yet.
+ *
+ * Note that this isn't a proper `ExecutionContext` implementation,
+ * just something very simple for compilation to work and
+ * to pass the current tests.
+ */
 trait ExecutionContext
 
 object ExecutionContext {
-  val global: ExecutionContext = new ExecutionContext{}
+  val global: ExecutionContext = new ExecutionContext {}
 
   object Implicits {
     implicit val global: ExecutionContext = ExecutionContext.global

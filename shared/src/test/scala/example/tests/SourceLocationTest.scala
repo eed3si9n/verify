@@ -15,14 +15,19 @@
  * limitations under the License.
  */
 
-package cutest
+package example.tests
 
-import scala.scalanative.testinterface.PreloadedClassLoader
+import cutest.SimpleTestSuite
+import cutest.sourcecode.SourceLocation
 
-package object platform {
-  type EnableReflectiveInstantiation =
-    scala.scalajs.reflect.annotation.EnableReflectiveInstantiation
-
-  private[cutest] def loadModule(name: String, loader: ClassLoader): Any =
-    loader.asInstanceOf[PreloadedClassLoader].loadPreloaded(name)
+object SourceLocationTest extends SimpleTestSuite {
+  test("implicit SourceLocation works") {
+    val pos = implicitly[SourceLocation]
+    pos match {
+      case SourceLocation("SourceLocationTest.scala", path, 25) =>
+        assert(path.contains("SourceLocationTest.scala"))
+      case _ =>
+        fail(s"Unexpected value: $pos")
+    }
+  }
 }

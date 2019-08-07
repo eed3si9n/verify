@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-package minitest
+package cutest
 package platform
 
-import scala.util.{Success, Try}
+import scala.util.{ Success, Try }
 
 /**
-  * Stub needed because Scala Native does not provide an
-  * implementation for [[scala.concurrent.Promise]] yet.
-  *
-  * Note that this isn't a proper `Future` implementation,
-  * just something very simple for compilation to work and
-  * to pass the current tests.
-  */
+ * Stub needed because Scala Native does not provide an
+ * implementation for [[scala.concurrent.Promise]] yet.
+ *
+ * Note that this isn't a proper `Future` implementation,
+ * just something very simple for compilation to work and
+ * to pass the current tests.
+ */
 final class Promise[A] private (private var value: Option[Try[A]] = None) {
   def success(value: A): this.type = {
     this.value = Some(Success(value))
