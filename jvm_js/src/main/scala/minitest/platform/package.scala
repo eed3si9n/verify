@@ -25,6 +25,7 @@ import org.portablescala.reflect.Reflect
  * utilities with a platform-specific implementation.
  */
 package object platform {
+
   /**
    * Type alias needed because Scala Native does not provide
    * the standard [[scala.concurrent.Future]] class yet.

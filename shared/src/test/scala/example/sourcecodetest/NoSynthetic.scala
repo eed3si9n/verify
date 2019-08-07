@@ -4,7 +4,7 @@ import cutest.sourcecode.{ Enclosing, FullName, Name }
 import cutest.SimpleTestSuite
 
 object NoSynthetic extends SimpleTestSuite {
-  class EnumValue(implicit name: Name){
+  class EnumValue(implicit name: Name) {
     override def toString = name.value
   }
   object Foo extends EnumValue
@@ -19,7 +19,7 @@ object NoSynthetic extends SimpleTestSuite {
   }
 
   def run() = {
-    object Bar{
+    object Bar {
       assert(Name() == "Bar")
       assert(FullName() == "example.sourcecodetest.NoSynthetic.Bar")
       assert(Enclosing() == "example.sourcecodetest.NoSynthetic.run Bar")

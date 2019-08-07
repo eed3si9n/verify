@@ -88,7 +88,7 @@ object SimpleTest extends SimpleTestSuite {
   testAsync("asynchronous test") {
     import cutest.platform.ExecutionContext.Implicits.global
 
-    Future(1).map(_+1).map { result =>
+    Future(1).map(_ + 1).map { result =>
       assertEquals(result, 2)
     }
   }
@@ -114,8 +114,7 @@ object SimpleTest extends SimpleTestSuite {
     val isSuccess = try {
       if (x == 1) fail("dummy")
       false
-    }
-    catch {
+    } catch {
       case ex: AssertionException =>
         ex.message == "dummy"
     }

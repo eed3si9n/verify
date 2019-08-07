@@ -20,25 +20,25 @@ package cutest.api
 import scala.util.control.NonFatal
 import cutest.sourcecode.SourceLocation
 
-abstract class MiniTestException(message: String, cause: Throwable)
-  extends RuntimeException(message, cause)
+abstract class MiniTestException(message: String, cause: Throwable) extends RuntimeException(message, cause)
 
 final class AssertionException(val message: String, val location: SourceLocation)
-  extends MiniTestException(message, null)
+    extends MiniTestException(message, null)
 
 final class UnexpectedException(val reason: Throwable, val location: SourceLocation)
-  extends MiniTestException(null, reason)
+    extends MiniTestException(null, reason)
 
 final class IgnoredException(val reason: Option[String], val location: Option[SourceLocation])
-  extends MiniTestException(reason.orNull, null)
+    extends MiniTestException(reason.orNull, null)
 
 final class CanceledException(val reason: Option[String], val location: Option[SourceLocation])
-  extends MiniTestException(reason.orNull, null)
+    extends MiniTestException(reason.orNull, null)
 
 final class InterceptException(val message: String, val location: SourceLocation)
-  extends MiniTestException(message, null)
+    extends MiniTestException(message, null)
 
 object OurException {
+
   /**
    * Utility for pattern matching.
    */
@@ -51,6 +51,7 @@ object OurException {
 }
 
 object NotOurException {
+
   /**
    * Utility for pattern matching.
    */

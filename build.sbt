@@ -19,11 +19,11 @@ import sbt._
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 // shadow sbt-scalajs' crossProject and CrossType until Scala.js 1.0.0 is released
-import sbtcrossproject.{crossProject, CrossType}
+import sbtcrossproject.{ crossProject, CrossType }
 import sbt.Keys._
 import com.typesafe.sbt.GitVersioning
 
-addCommandAlias("ci-all",  ";+clean ;+test:compile ;+test ;+package")
+addCommandAlias("ci-all", ";+clean ;+test:compile ;+test ;+package")
 addCommandAlias("release", ";+clean ;+minitestNative/clean ;+publishSigned ;+minitestNative/publishSigned")
 
 val Scala211 = "2.11.12"
@@ -70,7 +70,7 @@ lazy val scalaLinterOptions =
     "-Xlint:poly-implicit-overload", // parameterized overloaded implicit methods are not visible as view bounds
     "-Xlint:option-implicit", // Option.apply used implicit view
     "-Xlint:delayedinit-select", // Selecting member of DelayedInit
-    "-Xlint:package-object-classes", // Class or object defined in package object
+    "-Xlint:package-object-classes" // Class or object defined in package object
   )
 
 lazy val scalaTwoTwelveDeprecatedOptions =
@@ -88,15 +88,17 @@ lazy val sharedSettings = Seq(
     // absolute path of the source file, the absolute path of that file
     // will be put into the FILE_SOURCE variable, which is
     // definitely not what we want.
-    "-sourcepath", file(".").getAbsolutePath.replaceAll("[.]$", "")
+    "-sourcepath",
+    file(".").getAbsolutePath.replaceAll("[.]$", "")
   ),
-
   scalacOptions ++= Seq(
-    "-unchecked", "-deprecation", "-feature", "-Xlint",
+    "-unchecked",
+    "-deprecation",
+    "-feature",
+    "-Xlint",
     "-Ywarn-dead-code",
     "-Xlog-free-terms"
   ),
-
   // Version specific options
   scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, v)) if v >= 12 =>
@@ -118,12 +120,10 @@ lazy val sharedSettings = Seq(
     case _ =>
       Nil
   }),
-
   resolvers ++= Seq(
     "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases",
     Resolver.sonatypeRepo("releases")
   ),
-
   testFrameworks := Seq(new TestFramework("cutest.runner.Framework"))
 )
 
@@ -154,15 +154,17 @@ lazy val requiredMacroCompatDeps = Seq(
   }
 )
 
-lazy val minitestRoot = project.in(file("."))
+lazy val minitestRoot = project
+  .in(file("."))
   .aggregate(minitestJVM, minitestJS)
   .settings(
     name := "minitest root",
     Compile / sources := Nil,
-    skip in publish := true,
+    skip in publish := true
   )
 
-lazy val minitest = crossProject(JVMPlatform, JSPlatform, NativePlatform).in(file("."))
+lazy val minitest = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .in(file("."))
   .settings(
     name := "minitest",
     sharedSettings,
@@ -173,7 +175,7 @@ lazy val minitest = crossProject(JVMPlatform, JSPlatform, NativePlatform).in(fil
     crossScalaVersions += Scala3,
     libraryDependencies ++= Seq(
       "org.scala-sbt" % "test-interface" % "1.0"
-    ),
+    )
   )
   .platformsSettings(JVMPlatform, JSPlatform)(
     libraryDependencies ++= Seq(
@@ -197,6 +199,6 @@ lazy val minitest = crossProject(JVMPlatform, JSPlatform, NativePlatform).in(fil
     libraryDependencies += "org.scala-native" %%% "test-interface" % nativeVersion
   )
 
-lazy val minitestJVM    = minitest.jvm
-lazy val minitestJS     = minitest.js
+lazy val minitestJVM = minitest.jvm
+lazy val minitestJS = minitest.js
 lazy val minitestNative = minitest.native

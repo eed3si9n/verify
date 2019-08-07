@@ -18,7 +18,7 @@
 package cutest.api
 
 import scala.compat.Platform.EOL
-import scala.Console.{GREEN, RED, YELLOW, RESET}
+import scala.Console.{ GREEN, RED, YELLOW, RESET }
 import cutest.sourcecode.SourceLocation
 
 sealed trait Result[+T] {
@@ -34,8 +34,7 @@ object Result {
     }
   }
 
-  final case class Ignored(reason: Option[String], location: Option[SourceLocation])
-    extends Result[Nothing] {
+  final case class Ignored(reason: Option[String], location: Option[SourceLocation]) extends Result[Nothing] {
 
     def formatted(name: String, withColors: Boolean): String = {
       val color = if (withColors) YELLOW else ""
@@ -45,8 +44,7 @@ object Result {
     }
   }
 
-  final case class Canceled(reason: Option[String], location: Option[SourceLocation])
-    extends Result[Nothing] {
+  final case class Canceled(reason: Option[String], location: Option[SourceLocation]) extends Result[Nothing] {
 
     def formatted(name: String, withColors: Boolean): String = {
       val color = if (withColors) YELLOW else ""
@@ -57,20 +55,20 @@ object Result {
   }
 
   final case class Failure(msg: String, source: Option[Throwable], location: Option[SourceLocation])
-    extends Result[Nothing] {
+      extends Result[Nothing] {
 
     def formatted(name: String, withColors: Boolean): String =
       formatError(name, msg, source, location, Some(20), withColors)
   }
 
-  final case class Exception(source: Throwable, location: Option[SourceLocation])
-    extends Result[Nothing] {
+  final case class Exception(source: Throwable, location: Option[SourceLocation]) extends Result[Nothing] {
 
     def formatted(name: String, withColors: Boolean): String = {
       val description = {
         val name = source.getClass.getName
         val className = name.substring(name.lastIndexOf(".") + 1)
-        Option(source.getMessage).filterNot(_.isEmpty)
+        Option(source.getMessage)
+          .filterNot(_.isEmpty)
           .fold(className)(m => s"$className: $m")
       }
 
@@ -93,11 +91,14 @@ object Result {
       Result.Exception(other, None)
   }
 
-  private def formatError(name: String, msg: String,
-    source: Option[Throwable],
-    location: Option[SourceLocation],
-    traceLimit: Option[Int],
-    withColors: Boolean): String = {
+  private def formatError(
+      name: String,
+      msg: String,
+      source: Option[Throwable],
+      location: Option[SourceLocation],
+      traceLimit: Option[Int],
+      withColors: Boolean
+  ): String = {
 
     val color = if (withColors) RED else ""
     val reset = if (withColors) RESET else ""
@@ -105,7 +106,8 @@ object Result {
       val trace: Array[String] = {
         val tr = ex.getStackTrace.map(_.toString)
         traceLimit.fold(tr) { limit =>
-          if (tr.length <= limit) tr else
+          if (tr.length <= limit) tr
+          else
             tr.take(limit) :+ "..."
         }
       }
@@ -113,29 +115,30 @@ object Result {
       formatDescription(trace.mkString("\n"), None, color, reset, "    ")
     }
 
-    val formattedMessage = formatDescription(
-      if (msg != null && msg.nonEmpty) msg else "Test failed",
-      location, color, reset, "  ")
+    val formattedMessage =
+      formatDescription(if (msg != null && msg.nonEmpty) msg else "Test failed", location, color, reset, "  ")
 
     color + s"- $name *** FAILED ***" + reset + EOL +
       formattedMessage + stackTrace
   }
 
   private def formatDescription(
-    message: String,
-    location: Option[SourceLocation],
-    color: String,
-    reset: String,
-    prefix: String): String = {
+      message: String,
+      location: Option[SourceLocation],
+      color: String,
+      reset: String,
+      prefix: String
+  ): String = {
 
-    val lines = message.split("\\r?\\n").zipWithIndex.map { case (line, index) =>
-      if (index == 0)
-        color + prefix + line +
-          location.fold("")(l => s" (${l.fileName}:${l.line})") +
-          reset +
-          EOL
-      else
-        color + prefix + line + reset + EOL
+    val lines = message.split("\\r?\\n").zipWithIndex.map {
+      case (line, index) =>
+        if (index == 0)
+          color + prefix + line +
+            location.fold("")(l => s" (${l.fileName}:${l.line})") +
+            reset +
+            EOL
+        else
+          color + prefix + line + reset + EOL
     }
 
     lines.mkString

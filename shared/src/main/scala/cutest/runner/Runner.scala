@@ -17,14 +17,14 @@
 
 package cutest.runner
 
-import sbt.testing.{Runner => BaseRunner, Task => BaseTask, _}
+import sbt.testing.{ Runner => BaseRunner, Task => BaseTask, _ }
 
 final class Runner(
-  val args: Array[String],
-  val remoteArgs: Array[String],
-  val options: Options,
-  classLoader: ClassLoader)
-  extends BaseRunner {
+    val args: Array[String],
+    val remoteArgs: Array[String],
+    val options: Options,
+    classLoader: ClassLoader
+) extends BaseRunner {
 
   def done(): String = ""
 

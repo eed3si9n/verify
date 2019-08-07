@@ -1,6 +1,6 @@
 package cutest
 package sourcecode
 
-object Compat{
+object Compat {
   def isDotty: Boolean = true
 }

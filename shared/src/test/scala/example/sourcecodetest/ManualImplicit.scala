@@ -35,7 +35,7 @@ object ManualImplicit extends SimpleTestSuite {
       def enc2() =
         assert(
           qux()(Enclosing("example.sourcecodetest.ManualImplicit"))
-          == "example.sourcecodetest.ManualImplicit"
+            == "example.sourcecodetest.ManualImplicit"
         )
 
       enc2()

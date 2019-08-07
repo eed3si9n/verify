@@ -52,7 +52,7 @@ trait ArgsMacros {
   implicit def generate: Args = macro Macros.argsImpl
 }
 
-object Util{
+object Util {
   def isSynthetic(c: Compat.Context)(s: c.Symbol) = isSyntheticName(getName(c)(s))
   def isSyntheticName(name: String) = {
     name == "<init>" || (name.startsWith("<local ") && name.endsWith(">"))
@@ -65,7 +65,7 @@ object Macros {
   def nameImpl(c: Compat.Context): c.Expr[Name] = {
     import c.universe._
     var owner = Compat.enclosingOwner(c)
-    while(Util.isSynthetic(c)(owner)) owner = owner.owner
+    while (Util.isSynthetic(c)(owner)) owner = owner.owner
     val simpleName = Util.getName(c)(owner)
     c.Expr[sourcecode.Name](q"""${c.prefix}($simpleName)""")
   }
@@ -130,15 +130,15 @@ object Macros {
     c.Expr[Args](q"""Seq(..$textSeqs)""")
   }
 
-
   def text[T: c.WeakTypeTag](c: Compat.Context)(v: c.Expr[T]): c.Expr[sourcecode.Text[T]] = {
     import c.universe._
     val fileContent = new String(v.tree.pos.source.content)
     val start = v.tree.collect {
-      case treeVal => treeVal.pos match {
-        case NoPosition => Int.MaxValue
-        case p => p.startOrPoint
-      }
+      case treeVal =>
+        treeVal.pos match {
+          case NoPosition => Int.MaxValue
+          case p          => p.startOrPoint
+        }
     }.min
     val g = c.asInstanceOf[reflect.macros.runtime.Context].global
     val parser = g.newUnitParser(fileContent.drop(start))
@@ -149,7 +149,7 @@ object Macros {
     c.Expr[sourcecode.Text[T]](tree)
   }
   sealed trait Chunk
-  object Chunk{
+  object Chunk {
     case class Pkg(name: String) extends Chunk
     case class Obj(name: String) extends Chunk
     case class Cls(name: String) extends Chunk
@@ -166,34 +166,37 @@ object Macros {
     import c.universe._
     var current = Compat.enclosingOwner(c)
     var path = List.empty[Chunk]
-    while(current != NoSymbol && current.toString != "package <root>"){
+    while (current != NoSymbol && current.toString != "package <root>") {
       if (filter(current)) {
 
         val chunk = current match {
-          case x if x.isPackage => Chunk.Pkg
-          case x if x.isModuleClass => Chunk.Obj
+          case x if x.isPackage                    => Chunk.Pkg
+          case x if x.isModuleClass                => Chunk.Obj
           case x if x.isClass && x.asClass.isTrait => Chunk.Trt
-          case x if x.isClass => Chunk.Cls
-          case x if x.isMethod => Chunk.Def
-          case x if x.isTerm && x.asTerm.isVar => Chunk.Var
-          case x if x.isTerm && x.asTerm.isLazy => Chunk.Lzy
-          case x if x.isTerm && x.asTerm.isVal => Chunk.Val
+          case x if x.isClass                      => Chunk.Cls
+          case x if x.isMethod                     => Chunk.Def
+          case x if x.isTerm && x.asTerm.isVar     => Chunk.Var
+          case x if x.isTerm && x.asTerm.isLazy    => Chunk.Lzy
+          case x if x.isTerm && x.asTerm.isVal     => Chunk.Val
         }
 
         path = chunk(Util.getName(c)(current)) :: path
       }
       current = current.owner
     }
-    val renderedPath = path.map{
-      case Chunk.Pkg(s) => s + "."
-      case Chunk.Obj(s) => s + "."
-      case Chunk.Cls(s) => s + "#"
-      case Chunk.Trt(s) => s + "#"
-      case Chunk.Val(s) => s + " "
-      case Chunk.Var(s) => s + " "
-      case Chunk.Lzy(s) => s + " "
-      case Chunk.Def(s) => s + " "
-    }.mkString.dropRight(1)
+    val renderedPath = path
+      .map {
+        case Chunk.Pkg(s) => s + "."
+        case Chunk.Obj(s) => s + "."
+        case Chunk.Cls(s) => s + "#"
+        case Chunk.Trt(s) => s + "#"
+        case Chunk.Val(s) => s + " "
+        case Chunk.Var(s) => s + " "
+        case Chunk.Lzy(s) => s + " "
+        case Chunk.Def(s) => s + " "
+      }
+      .mkString
+      .dropRight(1)
     c.Expr[T](q"""${c.prefix}($renderedPath)""")
   }
 }

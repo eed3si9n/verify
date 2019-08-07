@@ -18,7 +18,7 @@
 package cutest.runner
 
 import cutest.api._
-import sbt.testing.{Task => BaseTask, _}
+import sbt.testing.{ Task => BaseTask, _ }
 import scala.compat.Platform.EOL
 import scala.concurrent.duration.Duration
 import cutest.platform._
@@ -46,11 +46,11 @@ final class Task(task: TaskDef, opts: Options, cl: ClassLoader) extends BaseTask
     }
   }
 
-  def execute(eventHandler: EventHandler, loggers: Array[Logger],
-    continuation: Array[BaseTask] => Unit): Unit = {
+  def execute(eventHandler: EventHandler, loggers: Array[Logger], continuation: Array[BaseTask] => Unit): Unit = {
 
     def loop(props: Iterator[TestSpec[Unit, Unit]]): Future[Unit] = {
-      if (!props.hasNext) unit else {
+      if (!props.hasNext) unit
+      else {
         val property = props.next()
         val startTS = System.currentTimeMillis()
         val futureResult = property(())
@@ -104,15 +104,15 @@ final class Task(task: TaskDef, opts: Options, cl: ClassLoader) extends BaseTask
 
     def status(): Status =
       result match {
-        case Result.Exception(_,_) =>
+        case Result.Exception(_, _) =>
           Status.Error
-        case Result.Failure(_,_,_) =>
+        case Result.Failure(_, _, _) =>
           Status.Failure
         case Result.Success(_) =>
           Status.Success
-        case Result.Ignored(_,_) =>
+        case Result.Ignored(_, _) =>
           Status.Ignored
-        case Result.Canceled(_,_) =>
+        case Result.Canceled(_, _) =>
           Status.Canceled
       }
 

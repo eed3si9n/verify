@@ -55,13 +55,13 @@ object Apply extends SimpleTestSuite {
   test("lazy Enclosing") {
     assert(
       (myLazy.someMethod == "example.sourcecodetest.Apply.myLazy$lzy Bar#someMethod enclosing") ||
-      (myLazy.someMethod == "example.sourcecodetest.Apply.myLazy Bar#someMethod enclosing"), // encoding changed in Scala 2.12
+        (myLazy.someMethod == "example.sourcecodetest.Apply.myLazy Bar#someMethod enclosing"), // encoding changed in Scala 2.12
       myLazy.someMethod
     )
   }
 
   lazy val myLazy = {
-    trait Bar{
+    trait Bar {
       val name = sourcecode.Name()
       val fullName = sourcecode.FullName()
       val file = sourcecode.SourceFilePath()
@@ -71,7 +71,7 @@ object Apply extends SimpleTestSuite {
         enclosing
       }
     }
-    val b = new Bar{}
+    val b = new Bar {}
     b
   }
 }

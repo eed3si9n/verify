@@ -32,8 +32,7 @@ trait Asserts {
     }
   }
 
-  def assert(condition: => Boolean, hint: String)
-    (implicit pos: SourceLocation): Unit = {
+  def assert(condition: => Boolean, hint: String)(implicit pos: SourceLocation): Unit = {
 
     try {
       if (!condition) throw new AssertionException(hint, pos)
@@ -43,12 +42,10 @@ trait Asserts {
     }
   }
 
-  def assertResult[T](expected: T)(callback: => T)
-    (implicit pos: SourceLocation): Unit =
+  def assertResult[T](expected: T)(callback: => T)(implicit pos: SourceLocation): Unit =
     assertResult(expected, "received {0} != expected {1}")(callback)
 
-  def assertResult[T](expected: T, hint: String)(callback: => T)
-    (implicit pos: SourceLocation): Unit = {
+  def assertResult[T](expected: T, hint: String)(callback: => T)(implicit pos: SourceLocation): Unit = {
 
     try {
       val rs = callback
@@ -60,17 +57,13 @@ trait Asserts {
     }
   }
 
-  def assertEquals[T](received: T, expected: T)
-    (implicit pos: SourceLocation): Unit = {
+  def assertEquals[T](received: T, expected: T)(implicit pos: SourceLocation): Unit = {
 
     if (received != expected)
-      throw new AssertionException(
-        Asserts.format("received {0} != expected {1}", received, expected),
-        pos)
+      throw new AssertionException(Asserts.format("received {0} != expected {1}", received, expected), pos)
   }
 
-  def intercept[E <: Throwable : ClassTag](callback: => Unit)
-    (implicit pos: SourceLocation): Unit = {
+  def intercept[E <: Throwable: ClassTag](callback: => Unit)(implicit pos: SourceLocation): Unit = {
 
     val E = implicitly[ClassTag[E]]
     try {
@@ -108,7 +101,8 @@ object Asserts extends Asserts {
   def format(tpl: String, values: Any*): String = {
     @tailrec
     def loop(index: Int, acc: String): String =
-      if (index >= values.length) acc else {
+      if (index >= values.length) acc
+      else {
         val value = String.valueOf(values(index))
         val newStr = acc.replaceAll(s"[{]$index[}]", Matcher.quoteReplacement(value))
         loop(index + 1, newStr)

@@ -30,11 +30,9 @@ object EnvironmentTest extends TestSuite[Int] {
     assert(env > 0)
   }
 
-  override def setupSuite() = {
-  }
+  override def setupSuite() = {}
 
-  override def tearDownSuite() = {
-  }
+  override def tearDownSuite() = {}
 
   test("simple test") { env =>
     assertEquals(env, env)
@@ -43,8 +41,8 @@ object EnvironmentTest extends TestSuite[Int] {
   testAsync("asynchronous test") { env =>
     import cutest.platform.ExecutionContext.Implicits.global
 
-    Future(env).map(_+1).map { result =>
-      assertEquals(result, env+1)
+    Future(env).map(_ + 1).map { result =>
+      assertEquals(result, env + 1)
     }
   }
 }

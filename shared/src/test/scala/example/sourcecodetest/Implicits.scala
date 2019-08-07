@@ -55,13 +55,13 @@ object Implicits extends SimpleTestSuite {
   test("lazy Enclosing") {
     assert(
       (myLazy.someMethod.value == "example.sourcecodetest.Implicits.myLazy$lzy Bar#someMethod enclosing") ||
-      (myLazy.someMethod.value == "example.sourcecodetest.Implicits.myLazy Bar#someMethod enclosing"), // encoding changed in Scala 2.12
+        (myLazy.someMethod.value == "example.sourcecodetest.Implicits.myLazy Bar#someMethod enclosing"), // encoding changed in Scala 2.12
       myLazy.someMethod.value
     )
   }
 
   lazy val myLazy = {
-    trait Bar{
+    trait Bar {
       val name = implicitly[sourcecode.Name]
       val fullName = implicitly[sourcecode.FullName]
       val file = implicitly[sourcecode.SourceFilePath]
@@ -71,7 +71,7 @@ object Implicits extends SimpleTestSuite {
         enclosing
       }
     }
-    val b = new Bar{}
+    val b = new Bar {}
     b
   }
   myLazy

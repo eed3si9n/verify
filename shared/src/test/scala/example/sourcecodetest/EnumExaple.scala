@@ -4,7 +4,7 @@ import cutest.sourcecode.Name
 import cutest._
 
 object EnumExaple extends SimpleTestSuite {
-  case class EnumValue(name: String){
+  case class EnumValue(name: String) {
     override def toString = name
   }
   class Enum {

@@ -18,7 +18,7 @@
 package cutest.runner
 
 import cutest.runner.Framework.ModuleFingerprint
-import sbt.testing.{Framework => BaseFramework, _}
+import sbt.testing.{ Framework => BaseFramework, _ }
 
 class Framework extends BaseFramework {
   def name(): String = "cutest"
@@ -31,11 +31,17 @@ class Framework extends BaseFramework {
   def runner(args: Array[String], remoteArgs: Array[String], testClassLoader: ClassLoader): Runner =
     new cutest.runner.Runner(args, remoteArgs, options, testClassLoader)
 
-  def slaveRunner(args: Array[String], remoteArgs: Array[String], testClassLoader: ClassLoader, send: String => Unit): Runner =
+  def slaveRunner(
+      args: Array[String],
+      remoteArgs: Array[String],
+      testClassLoader: ClassLoader,
+      send: String => Unit
+  ): Runner =
     runner(args, remoteArgs, testClassLoader)
 }
 
 object Framework {
+
   /**
    * A fingerprint that searches only for singleton objects
    * of type [[cutest.api.AbstractTestSuite]].

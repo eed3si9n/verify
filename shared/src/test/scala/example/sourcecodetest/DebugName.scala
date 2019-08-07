@@ -5,7 +5,7 @@ import cutest.SimpleTestSuite
 
 object DebugName extends SimpleTestSuite {
   test("debug") {
-    new Foo(123).bar("lol")  // bar [param -> arg]: (lol,123)
+    new Foo(123).bar("lol") // bar [param -> arg]: (lol,123)
     ()
   }
 
@@ -13,7 +13,7 @@ object DebugName extends SimpleTestSuite {
     println(name.value + " [" + value.source + "]: " + value.value)
   }
 
-  class Foo(arg: Int){
+  class Foo(arg: Int) {
     debug(arg) // Foo [arg]: 123
     def bar(param: String) = {
       debug(param -> arg)

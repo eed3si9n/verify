@@ -17,7 +17,7 @@ object TextTests extends SimpleTestSuite {
   }
 
   test("foo {...}") {
-    assert(foo{println("Hello"); "lol".toString * 2} == ("lollol", "\"lol\".toString * 2"))
+    assert(foo { println("Hello"); "lol".toString * 2 } == ("lollol", "\"lol\".toString * 2"))
   }
 
   def foo[T](v: cutest.sourcecode.Text[T]) = (v.value, v.source)
