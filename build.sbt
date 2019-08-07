@@ -188,26 +188,17 @@ lazy val minitest = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   )
   .jvmSettings(
     crossScalaVersions += Scala3,
-    libraryDependencies ++= Seq(
-      "org.scala-sbt" % "test-interface" % "1.0"
-    )
-  )
-  .platformsSettings(JVMPlatform, JSPlatform)(
-    libraryDependencies ++= Seq(
-      "org.portable-scala" %%% "portable-scala-reflect" % "0.1.0"
-    ),
-    unmanagedSourceDirectories in Compile += {
-      (baseDirectory in LocalRootProject).value / "jvm_js/src/main/scala"
-    }
+    libraryDependencies += "org.scala-sbt" % "test-interface" % "1.0"
   )
   .platformsSettings(NativePlatform)(
-    libraryDependencies ++= Seq(
-      "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided"
-    )
+    libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % Provided
   )
   .jsSettings(
     scalaJSSettings,
-    libraryDependencies += "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
+    libraryDependencies ++= Seq(
+      "org.portable-scala" %%% "portable-scala-reflect" % "0.1.0",
+      "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
+    )
   )
   .nativeSettings(
     nativeSettings,
