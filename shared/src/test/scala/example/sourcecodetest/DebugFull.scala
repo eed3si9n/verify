@@ -1,8 +1,8 @@
 package example.sourcecodetest
 
-import cutest.SimpleTestSuite
+import cutest.BasicTestSuite
 
-object DebugFull extends SimpleTestSuite {
+object DebugFull extends BasicTestSuite {
   test("debug") {
     new Foo(123).bar("lol") // example.sourcecodetest.DebugFull.Foo#bar [param -> arg]: (lol,123)
     ()

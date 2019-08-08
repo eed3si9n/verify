@@ -1,9 +1,9 @@
 package example.sourcecodetest
 
 import cutest.sourcecode.{ Name, Text }
-import cutest.SimpleTestSuite
+import cutest.BasicTestSuite
 
-object DebugName extends SimpleTestSuite {
+object DebugName extends BasicTestSuite {
   test("debug") {
     new Foo(123).bar("lol") // bar [param -> arg]: (lol,123)
     ()

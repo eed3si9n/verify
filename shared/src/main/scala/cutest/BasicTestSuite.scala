@@ -15,7 +15,7 @@ package cutest
 import cutest.api._
 import cutest.platform._
 
-trait SimpleTestSuite extends AbstractTestSuite with Asserts {
+trait BasicTestSuite extends AbstractTestSuite with Asserts {
   def test(name: String)(f: => Void): Unit =
     synchronized {
       if (isInitialized) throw initError()
@@ -41,6 +41,6 @@ trait SimpleTestSuite extends AbstractTestSuite with Asserts {
 
   private[this] def initError() =
     new AssertionError(
-      "Cannot define new tests after SimpleTestSuite was initialized"
+      "Cannot define new tests after BasicTestSuite was initialized"
     )
 }

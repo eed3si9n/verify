@@ -3,7 +3,7 @@ package example.sourcecodetest
 import cutest.sourcecode.FullName
 import cutest._
 
-object EnumFull extends SimpleTestSuite {
+object EnumFull extends BasicTestSuite {
   case class EnumValue(name: String) {
     override def toString = name
   }

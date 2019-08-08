@@ -22,10 +22,12 @@ addCommandAlias("ci-all", ";+clean ;+test:compile ;+test ;+package")
 addCommandAlias("release", ";+clean ;+minitestNative/clean ;+publishSigned ;+minitestNative/publishSigned")
 
 val Scala211 = "2.11.12"
+val Scala212 = "2.12.9"
+val Scala213 = "2.13.0"
 val Scala3 = "0.17.0-RC1"
 
 ThisBuild / scalaVersion := "2.12.8"
-ThisBuild / crossScalaVersions := Seq(Scala211, "2.12.8", "2.13.0")
+ThisBuild / crossScalaVersions := Seq(Scala211, Scala212, Scala213)
 
 ThisBuild / organization := "com.eed3si9n.cutest"
 ThisBuild / homepage := Some(url("https://www.scala-lang.org"))

@@ -1,9 +1,9 @@
 package example.sourcecodetest
 
 import cutest.sourcecode.Text
-import cutest.SimpleTestSuite
+import cutest.BasicTestSuite
 
-object DebugLite extends SimpleTestSuite {
+object DebugLite extends BasicTestSuite {
   test("debug") {
     new Foo(123).bar("lol") // [param -> arg]: (lol,123)
   }

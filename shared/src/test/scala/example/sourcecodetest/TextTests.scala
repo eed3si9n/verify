@@ -1,8 +1,8 @@
 package example.sourcecodetest
 
-import cutest.SimpleTestSuite
+import cutest.BasicTestSuite
 
-object TextTests extends SimpleTestSuite {
+object TextTests extends BasicTestSuite {
   test("foo(1)") {
     assert(foo(1) == (1, "1"))
   }

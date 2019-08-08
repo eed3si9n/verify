@@ -2,7 +2,8 @@ nanotest-strawman
 =================
 
 This is a fork of [Minitest](https://github.com/monix/minitest) to prepare for eventual merge into scala/scala.
-The purpose of nanotest-strawman is to create a cross-platform, zero-dependency, minimal, testing framework for bootstrapping the toolchain and a small handful of foundational third-party libraries. See https://github.com/scala/scala-dev/issues/641.
+The purpose of nanotest-strawman is to create a cross-platform, zero-dependency, minimal, testing framework for bootstrapping the toolchain and a small handful of foundational third-party libraries.
+See https://github.com/scala/scala-dev/issues/641.
 
 A mini testing framework cross-compiled for Scala 2.10, 2.11, 2.12,
 2.13, [Scala.js 0.6.x](http://www.scala-js.org/) and
@@ -21,15 +22,15 @@ testFrameworks += new TestFramework("minitest.runner.Framework")
 
 ## Tutorial
 
-Test suites MUST BE objects, not classes. To create a simple test suite, it could
-inherit from [SimpleTestSuite](shared/src/main/scala/minitest/SimpleTestSuite.scala):
+Test suites MUST BE objects, not classes. To create a test suite without `setup` and `teardown`,
+extend [BasicTestSuite](shared/src/main/scala/cutest/BasicTestSuite.scala) trait:
 
 Here's a simple test:
 
 ```scala
-import minitest._
+import cutest._
 
-object MySimpleSuite extends SimpleTestSuite {
+object SomethingTest extends BasicTestSuite {
   test("should be") {
     assertEquals(2, 1 + 1)
   }
@@ -55,15 +56,14 @@ object MySimpleSuite extends SimpleTestSuite {
 }
 ```
 
-In case you want to setup an environment for each test and need `setup` and
-`tearDown` semantics, per test, you could inherit from
-[TestSuite](shared/src/main/scala/minitest/TestSuite.scala). Then on each `test` definition,
-you'll receive a fresh value:
+In case you want to setup an environment for each test example and need `setup` and
+`tearDown` semantics, per test example, extend [TestSuite](shared/src/main/scala/cutest/TestSuite.scala).
+Then on each `test` definition, you'll receive a fresh value:
 
 ```scala
-import minitest.TestSuite
+import cutest.TestSuite
 
-object MyTestSuite extends TestSuite[Int] {
+object SomethingTest extends TestSuite[Int] {
   def setup(): Int = {
     Random.nextInt(100) + 1
   }
@@ -88,7 +88,7 @@ from doing this unless you really need it, since the per test semantics are much
 saner:
 
 ```scala
-object MyTestSuite extends TestSuite[Int] {
+object SomethingTest extends TestSuite[Int] {
   private var system: ActorSystem = _
 
   override def setupSuite(): Unit = {
@@ -102,36 +102,19 @@ object MyTestSuite extends TestSuite[Int] {
 }
 ```
 
-Minitest supports asynchronous results in tests, just use `testAsync` and
+Minitest supports asynchronous results in tests, use `testAsync` and
 return a `Future[Unit]`:
 
 ```scala
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object MySimpleSuite extends SimpleTestSuite {
+object SomethingTest extends BasicTestSuite {
   testAsync("asynchronous execution") {
     val future = Future(100).map(_+1)
 
     for (result <- future) yield {
       assertEquals(result, 101)
     }
-  }
-}
-```
-
-Minitest has integration with [ScalaCheck](https://www.scalacheck.org/).
-So for property-based testing:
-
-```scala
-import minitest.laws.Checkers
-
-object MyLawsTest extends SimpleTestSuite with Checkers {
-  test("addition of integers is commutative") {
-    check2((x: Int, y: Int) => x + y == y + x)
-  }
-
-  test("addition of integers is transitive") {
-    check3((x: Int, y: Int, z: Int) => (x + y) + z == x + (y + z))
   }
 }
 ```

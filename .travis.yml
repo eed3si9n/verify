@@ -1,10 +1,5 @@
 language: scala
 
-scala:
-  - 2.11.12
-  - 2.12.8
-  - 2.13.0
-
 env:
   matrix:
     - ADOPTOPENJDK=8
@@ -12,9 +7,6 @@ env:
 
 matrix:
   include:
-    - scala: 0.17.0-RC1
-      script:
-        - sbt ++${TRAVIS_SCALA_VERSION}! minitestJVM/test
     - scala: 2.11.12
       sudo: required
       before_install:
@@ -45,7 +37,11 @@ install:
   - java -Xmx32m -version
   - javac -J-Xmx32m -version
 
-script: sbt ++${TRAVIS_SCALA_VERSION}! minitestJVM/test minitestJS/test
+script:
+  - sbt ++2.11.12!    minitestJVM/test minitestJS/test
+  - sbt ++2.12.9!     minitestJVM/test minitestJS/test
+  - sbt ++2.13.0!     minitestJVM/test minitestJS/test
+  - sbt ++0.17.0-RC1! minitestJVM/test
 
 before_cache:
   - du -h -d 1 $HOME/.ivy2/cache
