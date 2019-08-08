@@ -1,3 +1,4 @@
+/*
 package example.sourcecodetest
 
 import cutest.SimpleTestSuite
@@ -72,3 +73,4 @@ object ArgsTests extends SimpleTestSuite {
     assert(args == Seq(Seq("p1" -> "text", "p2" -> 42, "p3" -> false), Seq("foo" -> "bar")))
   }
 }
+ */

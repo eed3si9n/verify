@@ -12,6 +12,9 @@ env:
 
 matrix:
   include:
+    - scala: 0.17.0-RC1
+      script:
+        - sbt ++${TRAVIS_SCALA_VERSION}! minitestJVM/test
     - scala: 2.11.12
       sudo: required
       before_install:

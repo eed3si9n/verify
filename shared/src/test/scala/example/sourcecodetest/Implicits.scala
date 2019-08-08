@@ -1,39 +1,40 @@
 package example.sourcecodetest
 
-import cutest.{ SimpleTestSuite, sourcecode }
+import cutest.SimpleTestSuite
+import cutest.sourcecode._
 
 object Implicits extends SimpleTestSuite {
-  val name = implicitly[sourcecode.Name]
+  val name = implicitly[Name]
   test("Name") {
     assert(name.value == "name")
   }
 
-  val fullName = implicitly[sourcecode.FullName]
+  val fullName = implicitly[FullName]
   test("FullName") {
     assert(fullName.value == "example.sourcecodetest.Implicits.fullName")
   }
 
   def someMethod = {
-    val enclosing = implicitly[sourcecode.Enclosing]
+    val enclosing = implicitly[Enclosing]
     enclosing
   }
   test("Enclosing") {
     assert(someMethod.value == "example.sourcecodetest.Implicits.someMethod enclosing")
   }
 
-  val pkg = implicitly[sourcecode.Pkg]
+  val pkg = implicitly[Pkg]
   test("Pkg") {
     assert(pkg.value == "example.sourcecodetest")
   }
 
-  val file = implicitly[sourcecode.SourceFilePath]
+  val file = implicitly[SourceFilePath]
   test("SourceFilePath") {
     assert(file.value.endsWith("/sourcecodetest/Implicits.scala"))
   }
 
-  val line = implicitly[sourcecode.Line]
+  val line = implicitly[Line]
   test("Line") {
-    assert(line.value == 34)
+    assert(line.value == 35)
   }
 
   test("lazy Name") {
@@ -49,7 +50,7 @@ object Implicits extends SimpleTestSuite {
   }
 
   test("lazy Line") {
-    assert(myLazy.line.value == 68)
+    assert(myLazy.line.value == 69)
   }
 
   test("lazy Enclosing") {
@@ -60,19 +61,26 @@ object Implicits extends SimpleTestSuite {
     )
   }
 
-  lazy val myLazy = {
-    trait Bar {
-      val name = implicitly[sourcecode.Name]
-      val fullName = implicitly[sourcecode.FullName]
-      val file = implicitly[sourcecode.SourceFilePath]
-      val line = implicitly[sourcecode.Line]
-      def someMethod = {
-        val enclosing = implicitly[sourcecode.Enclosing]
+  lazy val myLazy: BarApi = {
+    trait Bar extends BarApi {
+      override val name = implicitly[Name]
+      override val fullName = implicitly[FullName]
+      override val file = implicitly[SourceFilePath]
+      override val line = implicitly[Line]
+      override def someMethod = {
+        val enclosing = implicitly[Enclosing]
         enclosing
       }
     }
     val b = new Bar {}
     b
   }
-  myLazy
+
+  trait BarApi {
+    def name: Name
+    def fullName: FullName
+    def file: SourceFilePath
+    def line: Line
+    def someMethod: Enclosing
+  }
 }

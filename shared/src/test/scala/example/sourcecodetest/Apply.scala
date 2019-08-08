@@ -60,18 +60,26 @@ object Apply extends SimpleTestSuite {
     )
   }
 
-  lazy val myLazy = {
-    trait Bar {
-      val name = sourcecode.Name()
-      val fullName = sourcecode.FullName()
-      val file = sourcecode.SourceFilePath()
-      val line = sourcecode.Line()
-      def someMethod = {
+  lazy val myLazy: BarApi = {
+    trait Bar extends BarApi {
+      override val name = sourcecode.Name()
+      override val fullName = sourcecode.FullName()
+      override val file = sourcecode.SourceFilePath()
+      override val line = sourcecode.Line()
+      override def someMethod = {
         val enclosing = sourcecode.Enclosing()
         enclosing
       }
     }
     val b = new Bar {}
     b
+  }
+
+  trait BarApi {
+    def name: String
+    def fullName: String
+    def file: String
+    def line: Int
+    def someMethod: String
   }
 }
