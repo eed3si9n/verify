@@ -42,6 +42,15 @@ object SourceFilePath extends SourceFilePathMacros with SourceCompanion[String, 
 case class Line(value: Int) extends SourceValue[Int]
 object Line extends LineMacros with SourceCompanion[Int, Line](new Line(_))
 
+case class SourceLocation(fileName: String, filePath: String, line: Int)
+object SourceLocation {
+  import scala.language.implicitConversions
+  implicit def sourcecodeSourceLocation(implicit n: SourceFileName, p: SourceFilePath, l: Line): SourceLocation =
+    SourceLocation(n.value, p.value, l.value)
+
+  def apply() given SourceLocation: SourceLocation = the[SourceLocation]
+}
+
 case class Enclosing(value: String) extends SourceValue[String]
 object Enclosing extends EnclosingMacros with SourceCompanion[String, Enclosing](new Enclosing(_)) {
   case class Machine(value: String) extends SourceValue[String]

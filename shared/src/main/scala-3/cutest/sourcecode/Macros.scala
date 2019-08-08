@@ -37,6 +37,10 @@ abstract class SourceFilePathMacros {
   inline given as SourceFilePath = ${Macros.sourceFilePathImpl}
 }
 
+abstract class SourceFileNameMacros {
+  inline given as SourceFileName = ${Macros.sourceFileNameImpl}
+}
+
 abstract class LineMacros {
   inline given as sourcecode.Line = ${Macros.lineImpl}
 }
@@ -128,13 +132,25 @@ object Macros {
     '{ FullName.Machine(${Util.literal(qctx)(fullName)}) }
   }
 
-  def fileImpl given (qctx: QuoteContext): Expr[File] = {
+  def sourceFileNameImpl given (qctx: QuoteContext): Expr[SourceFileName] = {
     import qctx.tasty._
-    val file = rootContext.source
-    '{ sourcecode.File(${Util.literal(qctx)(file.toString)}) }
+    val name = Option(rootContext.source) match {
+      case Some(file) => file.getFileName.toString
+      case _          => "<none>"
+    }
+    '{ SourceFileName(${Util.literal(qctx)(name)}) }
   }
 
-  def lineImpl given (qctx: QuoteContext): Expr[sourcecode.Line] = {
+  def sourceFilePathImpl given (qctx: QuoteContext): Expr[SourceFilePath] = {
+    import qctx.tasty._
+    val path = Option(rootContext.source) match {
+      case Some(file) => file.toString
+      case _          => "<none>"
+    }
+    '{ SourceFilePath(${Util.literal(qctx)(path)}) }
+  }
+
+  def lineImpl given (qctx: QuoteContext): Expr[Line] = {
     import qctx.tasty._
     val line = rootPosition.startLine + 1
     '{ Line(${Util.literal(qctx)(line)}) }
@@ -218,13 +234,13 @@ object Macros {
     while(current != NoSymbol && current.toString != "package <root>" && current.toString != "module class <root>"){
       if (filter(current)) {
 
-        val chunk = current match {
-          case IsPackageDefSymbol(_) => Chunk.Pkg
-          case IsClassDefSymbol(x) if x.flags.is(Flags.ModuleClass) => Chunk.Obj
-          case IsClassDefSymbol(x) if x.flags.is(Flags.Trait) => Chunk.Trt
-          case IsClassDefSymbol(_) => Chunk.Cls
-          case IsDefDefSymbol(_) => Chunk.Def
-          case IsValDefSymbol(_) => Chunk.Val
+        val chunk: String => Chunk = current match {
+          case IsPackageDefSymbol(_) => Chunk.Pkg(_)
+          case IsClassDefSymbol(x) if x.flags.is(Flags.ModuleClass) => Chunk.Obj(_)
+          case IsClassDefSymbol(x) if x.flags.is(Flags.Trait) => Chunk.Trt(_)
+          case IsClassDefSymbol(_) => Chunk.Cls(_)
+          case IsDefDefSymbol(_) => Chunk.Def(_)
+          case IsValDefSymbol(_) => Chunk.Val(_)
         }
 
         path = chunk(Util.getName(qctx)(current)) :: path

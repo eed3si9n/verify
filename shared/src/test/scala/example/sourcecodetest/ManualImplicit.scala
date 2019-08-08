@@ -19,10 +19,9 @@ object ManualImplicit extends SimpleTestSuite {
   }
 
   test("FullName") {
-    def apply() {
+    def apply() = {
       assert(baz() == "example.sourcecodetest.ManualImplicit.apply", baz())
       assert(baz() == "example.sourcecodetest.ManualImplicit.apply")
-
     }
     apply()
   }

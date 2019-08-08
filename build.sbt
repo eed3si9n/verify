@@ -120,9 +120,9 @@ lazy val sharedSettings = Seq(
     case Some((2, 12)) =>
       scalaLinterOptions ++ scalaTwoTwelveDeprecatedOptions
     case Some((2, 11)) =>
-      scalaLinterOptions ++ Seq("-target:jvm-1.6") ++ scalaTwoTwelveDeprecatedOptions
+      scalaLinterOptions ++ Seq("-target:jvm-1.8") ++ scalaTwoTwelveDeprecatedOptions
     case _ =>
-      Seq("-target:jvm-1.6")
+      Seq("-target:jvm-1.8")
   }),
   scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, 11 | 12)) =>
