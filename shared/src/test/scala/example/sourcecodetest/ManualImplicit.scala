@@ -1,9 +1,9 @@
 package example.sourcecodetest
 
 import cutest.sourcecode.{ Enclosing, FullName, Line, Name }
-import cutest.SimpleTestSuite
+import cutest.BasicTestSuite
 
-object ManualImplicit extends SimpleTestSuite {
+object ManualImplicit extends BasicTestSuite {
   test("Name") {
     def apply() = {
       assert(foo() == "apply")

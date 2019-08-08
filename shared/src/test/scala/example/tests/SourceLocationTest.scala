@@ -17,10 +17,10 @@
 
 package example.tests
 
-import cutest.SimpleTestSuite
+import cutest.BasicTestSuite
 import cutest.sourcecode.SourceLocation
 
-object SourceLocationTest extends SimpleTestSuite {
+object SourceLocationTest extends BasicTestSuite {
   test("implicit SourceLocation works") {
     val pos = implicitly[SourceLocation]
     pos match {

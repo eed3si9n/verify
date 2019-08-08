@@ -1,9 +1,9 @@
 package example.sourcecodetest
 
 import cutest.sourcecode.{ Enclosing, FullName, Name }
-import cutest.SimpleTestSuite
+import cutest.BasicTestSuite
 
-object NoSynthetic extends SimpleTestSuite {
+object NoSynthetic extends BasicTestSuite {
   class EnumValue(implicit name: Name) {
     override def toString = name.value
   }

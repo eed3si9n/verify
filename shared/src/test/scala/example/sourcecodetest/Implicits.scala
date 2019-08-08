@@ -1,9 +1,9 @@
 package example.sourcecodetest
 
-import cutest.SimpleTestSuite
+import cutest.BasicTestSuite
 import cutest.sourcecode._
 
-object Implicits extends SimpleTestSuite {
+object Implicits extends BasicTestSuite {
   val name = implicitly[Name]
   test("Name") {
     assert(name.value == "name")

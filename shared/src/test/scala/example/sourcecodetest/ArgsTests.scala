@@ -1,9 +1,9 @@
 /*
 package example.sourcecodetest
 
-import cutest.SimpleTestSuite
+import cutest.BasicTestSuite
 
-object ArgsTests extends SimpleTestSuite {
+object ArgsTests extends BasicTestSuite {
   var args: Seq[Seq[(String, Any)]] = Seq()
 
   def debug(implicit arguments: cutest.sourcecode.Args): Unit =

@@ -17,11 +17,11 @@
 
 package example.tests
 
-import cutest.SimpleTestSuite
+import cutest.BasicTestSuite
 import cutest.api.AssertionException
 import cutest.platform.Future
 
-object SimpleTest extends SimpleTestSuite {
+object SimpleTest extends BasicTestSuite {
   test("ignored test") {
     ignore()
   }

@@ -2,7 +2,7 @@ package example.sourcecodetest
 
 import cutest._
 
-object Apply extends SimpleTestSuite {
+object Apply extends BasicTestSuite {
   val name = sourcecode.Name()
   test("Name") {
     assert(name == "name")

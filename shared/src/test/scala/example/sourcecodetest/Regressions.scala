@@ -1,9 +1,9 @@
 package example.sourcecodetest
 
-import cutest.SimpleTestSuite
+import cutest.BasicTestSuite
 import cutest.sourcecode.Text
 
-object Regressions extends SimpleTestSuite {
+object Regressions extends BasicTestSuite {
   test("bug17") {
     val text = Text(Seq(1).map(_ + 1))
     assert(
