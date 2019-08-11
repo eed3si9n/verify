@@ -1,12 +1,12 @@
 /*
 package example.sourcecodetest
 
-import cutest.BasicTestSuite
+import verify.BasicTestSuite
 
 object ArgsTests extends BasicTestSuite {
   var args: Seq[Seq[(String, Any)]] = Seq()
 
-  def debug(implicit arguments: cutest.sourcecode.Args): Unit =
+  def debug(implicit arguments: verify.sourcecode.Args): Unit =
     args = arguments.value.map(_.map(t => t.source -> t.value))
 
   def foo(p1: String, p2: Long, p3: Boolean)(foo: String, bar: String): Unit = {

@@ -1,12 +1,12 @@
-nanotest-strawman
-=================
+scala-verify
+============
 
-This is a fork of [Minitest](https://github.com/monix/minitest) to prepare for eventual merge into scala/scala.
-The purpose of nanotest-strawman is to create a cross-platform, zero-dependency, minimal, testing framework for bootstrapping the toolchain and a small handful of foundational third-party libraries.
+scala-verify is a fork of [Minitest](https://github.com/monix/minitest) to prepare for eventual merge into scala/scala.
+The purpose of scala-verify is to create a cross-platform, zero-dependency, minimal, testing framework for bootstrapping the toolchain and a small handful of foundational third-party libraries.
 See https://github.com/scala/scala-dev/issues/641.
 
-A mini testing framework cross-compiled for Scala 2.10, 2.11, 2.12,
-2.13, [Scala.js 0.6.x](http://www.scala-js.org/) and
+A mini testing framework cross-compiled for Scala 2.11, 2.12,
+2.13, Dotty, [Scala.js 0.6.x](http://www.scala-js.org/) and
 [Scala Native 0.3.x](https://www.scala-native.org/).
 
 ## Usage in sbt
@@ -23,12 +23,12 @@ testFrameworks += new TestFramework("minitest.runner.Framework")
 ## Tutorial
 
 Test suites MUST BE objects, not classes. To create a test suite without `setup` and `teardown`,
-extend [BasicTestSuite](shared/src/main/scala/cutest/BasicTestSuite.scala) trait:
+extend [BasicTestSuite](shared/src/main/scala/verify/BasicTestSuite.scala) trait:
 
 Here's a simple test:
 
 ```scala
-import cutest._
+import verify._
 
 object SomethingTest extends BasicTestSuite {
   test("should be") {
@@ -57,11 +57,11 @@ object SomethingTest extends BasicTestSuite {
 ```
 
 In case you want to setup an environment for each test example and need `setup` and
-`tearDown` semantics, per test example, extend [TestSuite](shared/src/main/scala/cutest/TestSuite.scala).
+`tearDown` semantics, per test example, extend [TestSuite](shared/src/main/scala/verify/TestSuite.scala).
 Then on each `test` definition, you'll receive a fresh value:
 
 ```scala
-import cutest.TestSuite
+import verify.TestSuite
 
 object SomethingTest extends TestSuite[Int] {
   def setup(): Int = {

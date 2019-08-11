@@ -1,7 +1,7 @@
 package example.sourcecodetest
 
-import cutest.BasicTestSuite
-import cutest.sourcecode._
+import verify.BasicTestSuite
+import verify.sourcecode._
 
 object Implicits extends BasicTestSuite {
   val name = implicitly[Name]

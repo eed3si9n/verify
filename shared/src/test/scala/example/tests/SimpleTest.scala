@@ -17,9 +17,8 @@
 
 package example.tests
 
-import cutest.BasicTestSuite
-import cutest.api.AssertionException
-import cutest.platform.Future
+import verify.{ AssertionException, BasicTestSuite }
+import verify.platform.Future
 
 object SimpleTest extends BasicTestSuite {
   test("ignored test") {
@@ -86,7 +85,7 @@ object SimpleTest extends BasicTestSuite {
   }
 
   testAsync("asynchronous test") {
-    import cutest.platform.ExecutionContext.Implicits.global
+    import verify.platform.ExecutionContext.Implicits.global
 
     Future(1).map(_ + 1).map { result =>
       assertEquals(result, 2)

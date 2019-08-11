@@ -19,17 +19,17 @@ import sbt.Keys._
 import com.typesafe.sbt.GitVersioning
 
 addCommandAlias("ci-all", ";+clean ;+test:compile ;+test ;+package")
-addCommandAlias("release", ";+clean ;+minitestNative/clean ;+publishSigned ;+minitestNative/publishSigned")
+addCommandAlias("release", ";+clean ;+verifyNative/clean ;+publishSigned ;+verifyNative/publishSigned")
 
 val Scala211 = "2.11.12"
 val Scala212 = "2.12.9"
 val Scala213 = "2.13.0"
 val Scala3 = "0.17.0-RC1"
 
-ThisBuild / scalaVersion := "2.12.8"
+ThisBuild / scalaVersion := Scala212
 ThisBuild / crossScalaVersions := Seq(Scala211, Scala212, Scala213)
 
-ThisBuild / organization := "com.eed3si9n.cutest"
+ThisBuild / organization := "com.eed3si9n.verify"
 ThisBuild / homepage := Some(url("https://www.scala-lang.org"))
 ThisBuild / startYear := Some(2002)
 ThisBuild / licenses += (("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0")))
@@ -48,7 +48,76 @@ ThisBuild / headerLicense := Some(
   )
 )
 
-def scalaPartV = Def setting (CrossVersion partialVersion scalaVersion.value)
+val ReleaseTag = """^v(\d+\.\d+\.\d+(?:[-.]\w+)?)$""".r
+
+lazy val verifyRoot = (project in file("."))
+  .enablePlugins(GitVersioning)
+  .aggregate(verifyJVM, verifyJS)
+  .settings(
+    name := "verify root",
+    Compile / sources := Nil,
+    skip in publish := true,
+    /* The BaseVersion setting represents the in-development (upcoming) version,
+     * as an alternative to SNAPSHOTS.
+     */
+    git.baseVersion := "2.5.0",
+    git.gitTagToVersionNumber := {
+      case ReleaseTag(v) => Some(v)
+      case _             => None
+    },
+    git.formattedShaVersion := {
+      val suffix = git.makeUncommittedSignifierSuffix(git.gitUncommittedChanges.value, git.uncommittedSignifier.value)
+
+      git.gitHeadCommit.value map { _.substring(0, 7) } map { sha =>
+        git.baseVersion.value + "-" + sha + suffix
+      }
+    }
+  )
+
+lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file("."))
+  .settings(
+    name := "verify",
+    sharedSettings,
+    crossVersionSharedSources,
+    libraryDependencies ++= {
+      val crossVer = CrossVersion.partialVersion(scalaVersion.value)
+      crossVer match {
+        case Some((2, _)) =>
+          List(
+            "org.scala-lang" % "scala-reflect" % scalaVersion.value % Compile,
+            "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided
+          )
+        case _ => Nil
+      }
+    }
+  )
+  .jvmSettings(
+    crossScalaVersions += Scala3,
+    libraryDependencies += "org.scala-sbt" % "test-interface" % "1.0"
+  )
+  .platformsSettings(NativePlatform)(
+    libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % Provided
+  )
+  .jsSettings(
+    libraryDependencies ++= Seq(
+      "org.portable-scala" %%% "portable-scala-reflect" % "0.1.0",
+      "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
+    ),
+    scalaJSStage in Test := FastOptStage
+  )
+  .nativeSettings(
+    libraryDependencies += "org.scala-native" %%% "test-interface" % nativeVersion,
+    scalaVersion := Scala211,
+    crossScalaVersions := Seq(Scala211),
+    publishConfiguration := publishConfiguration.value.withOverwrite(true),
+    publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
+  )
+
+lazy val verifyJVM = verify.jvm
+lazy val verifyJS = verify.js
+lazy val verifyNative = verify.native
+
+def scalaPartV = Def.setting(CrossVersion partialVersion scalaVersion.value)
 lazy val crossVersionSharedSources: Seq[Setting[_]] =
   (Seq(Compile, Test).map { sc =>
     (unmanagedSourceDirectories in sc) ++= {
@@ -137,76 +206,47 @@ lazy val sharedSettings = Seq(
       Nil
   }),
   resolvers ++= Seq(
-    "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases",
-    Resolver.sonatypeRepo("releases")
+    "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases"
   ),
-  testFrameworks := Seq(new TestFramework("cutest.runner.Framework")),
+  testFrameworks := Seq(new TestFramework("verify.runner.Framework")),
   headerLicense := (ThisBuild / headerLicense).value
 )
 
-lazy val scalaJSSettings = Seq(
-  scalaJSStage in Test := FastOptStage
+ThisBuild / scmInfo := Some(
+  ScmInfo(
+    url("https://github.com/scala/nanotest-strawman"),
+    "scm:git@github.com:scala/nanotest-strawman.git"
+  )
 )
 
-lazy val nativeSettings = Seq(
-  scalaVersion := Scala211,
-  crossScalaVersions := Seq(Scala211),
-  publishConfiguration := publishConfiguration.value.withOverwrite(true),
-  publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
+ThisBuild / developers := List(
+  Developer(
+    id = "alexelcu",
+    name = "Alexandru Nedelcu",
+    email = "noreply@alexn.org",
+    url = url("https://alexn.org")
+  ),
+  Developer(
+    id = "eed3i9n",
+    name = "Eugene Yokota",
+    email = "@eed3si9n",
+    url = url("https://eed3si9n.com")
+  )
 )
 
-lazy val needsScalaParadise = settingKey[Boolean]("Needs Scala Paradise")
-
-lazy val requiredMacroCompatDeps = Seq(
-  libraryDependencies ++= {
-    val crossVer = CrossVersion.partialVersion(scalaVersion.value)
-    crossVer match {
-      case Some((2, _)) =>
-        List(
-          "org.scala-lang" % "scala-reflect" % scalaVersion.value % Compile,
-          "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided
-        )
-      case _ => Nil
-    }
-  }
-)
-
-lazy val minitestRoot = project
-  .in(file("."))
-  .aggregate(minitestJVM, minitestJS)
-  .settings(
-    name := "minitest root",
-    Compile / sources := Nil,
-    skip in publish := true
-  )
-
-lazy val minitest = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-  .in(file("."))
-  .settings(
-    name := "minitest",
-    sharedSettings,
-    crossVersionSharedSources,
-    requiredMacroCompatDeps
-  )
-  .jvmSettings(
-    crossScalaVersions += Scala3,
-    libraryDependencies += "org.scala-sbt" % "test-interface" % "1.0"
-  )
-  .platformsSettings(NativePlatform)(
-    libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % Provided
-  )
-  .jsSettings(
-    scalaJSSettings,
-    libraryDependencies ++= Seq(
-      "org.portable-scala" %%% "portable-scala-reflect" % "0.1.0",
-      "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
-    )
-  )
-  .nativeSettings(
-    nativeSettings,
-    libraryDependencies += "org.scala-native" %%% "test-interface" % nativeVersion
-  )
-
-lazy val minitestJVM = minitest.jvm
-lazy val minitestJS = minitest.js
-lazy val minitestNative = minitest.native
+// -- Settings meant for deployment on oss.sonatype.org
+ThisBuild / publishMavenStyle := true
+ThisBuild / publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}
+ThisBuild / isSnapshot := {
+  (ThisBuild / version).value endsWith "SNAPSHOT"
+}
+ThisBuild / Test / publishArtifact := false
+ThisBuild / pomIncludeRepository := { _ =>
+  false
+} // removes optional dependencies

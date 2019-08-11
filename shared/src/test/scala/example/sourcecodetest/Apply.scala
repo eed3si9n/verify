@@ -1,6 +1,6 @@
 package example.sourcecodetest
 
-import cutest._
+import verify._
 
 object Apply extends BasicTestSuite {
   val name = sourcecode.Name()

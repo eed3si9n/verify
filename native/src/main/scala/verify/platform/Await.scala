@@ -15,34 +15,20 @@
  * limitations under the License.
  */
 
-package example.tests
+package verify
+package platform
 
-import verify.TestSuite
-import verify.platform.Future
-import scala.util.Random
+import scala.concurrent.duration.Duration
 
-object EnvironmentTest extends TestSuite[Int] {
-  def setup(): Int = {
-    Random.nextInt(100) + 1
-  }
-
-  def tearDown(env: Int): Unit = {
-    assert(env > 0)
-  }
-
-  override def setupSuite() = {}
-
-  override def tearDownSuite() = {}
-
-  test("simple test") { env =>
-    assertEquals(env, env)
-  }
-
-  testAsync("asynchronous test") { env =>
-    import verify.platform.ExecutionContext.Implicits.global
-
-    Future(env).map(_ + 1).map { result =>
-      assertEquals(result, env + 1)
-    }
-  }
+/**
+ * Stub needed because Scala Native does not provide an
+ * implementation for [[scala.concurrent.Await]] yet.
+ *
+ * Note that this isn't a proper `Await` implementation,
+ * just something very simple for compilation to work and
+ * to pass the current tests.
+ */
+object Await {
+  def result[A](future: Future[A], duration: Duration): A =
+    future.value.get
 }

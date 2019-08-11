@@ -1,7 +1,7 @@
 package example.sourcecodetest
 
-import cutest.BasicTestSuite
-import cutest.sourcecode.Text
+import verify.BasicTestSuite
+import verify.sourcecode.Text
 
 object Regressions extends BasicTestSuite {
   test("bug17") {

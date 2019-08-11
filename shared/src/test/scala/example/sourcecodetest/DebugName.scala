@@ -1,7 +1,7 @@
 package example.sourcecodetest
 
-import cutest.sourcecode.{ Name, Text }
-import cutest.BasicTestSuite
+import verify.sourcecode.{ Name, Text }
+import verify.BasicTestSuite
 
 object DebugName extends BasicTestSuite {
   test("debug") {
