@@ -1,6 +1,7 @@
 package example.sourcecodetest
 
-import cutest.BasicTestSuite
+import verify.BasicTestSuite
+import verify.sourcecode.{ Enclosing, Text }
 
 object DebugFull extends BasicTestSuite {
   test("debug") {
@@ -15,7 +16,7 @@ object DebugFull extends BasicTestSuite {
     }
   }
 
-  def debug[V](value: cutest.sourcecode.Text[V])(implicit enclosing: cutest.sourcecode.Enclosing) = {
+  def debug[V](value: Text[V])(implicit enclosing: Enclosing) = {
     println(enclosing.value + " [" + value.source + "]: " + value.value)
   }
 }

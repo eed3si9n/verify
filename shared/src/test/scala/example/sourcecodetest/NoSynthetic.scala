@@ -1,7 +1,7 @@
 package example.sourcecodetest
 
-import cutest.sourcecode.{ Enclosing, FullName, Name }
-import cutest.BasicTestSuite
+import verify.sourcecode.{ Enclosing, FullName, Name }
+import verify.BasicTestSuite
 
 object NoSynthetic extends BasicTestSuite {
   class EnumValue(implicit name: Name) {

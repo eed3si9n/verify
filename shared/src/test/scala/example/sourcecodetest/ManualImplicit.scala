@@ -1,7 +1,7 @@
 package example.sourcecodetest
 
-import cutest.sourcecode.{ Enclosing, FullName, Line, Name }
-import cutest.BasicTestSuite
+import verify.sourcecode.{ Enclosing, FullName, Line, Name }
+import verify.BasicTestSuite
 
 object ManualImplicit extends BasicTestSuite {
   test("Name") {

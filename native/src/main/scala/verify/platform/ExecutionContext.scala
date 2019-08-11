@@ -15,34 +15,23 @@
  * limitations under the License.
  */
 
-package example.tests
+package verify
+package platform
 
-import verify.TestSuite
-import verify.platform.Future
-import scala.util.Random
+/**
+ * Stub needed because Scala Native does not provide an
+ * implementation for [[scala.concurrent.ExecutionContext]] yet.
+ *
+ * Note that this isn't a proper `ExecutionContext` implementation,
+ * just something very simple for compilation to work and
+ * to pass the current tests.
+ */
+trait ExecutionContext
 
-object EnvironmentTest extends TestSuite[Int] {
-  def setup(): Int = {
-    Random.nextInt(100) + 1
-  }
+object ExecutionContext {
+  val global: ExecutionContext = new ExecutionContext {}
 
-  def tearDown(env: Int): Unit = {
-    assert(env > 0)
-  }
-
-  override def setupSuite() = {}
-
-  override def tearDownSuite() = {}
-
-  test("simple test") { env =>
-    assertEquals(env, env)
-  }
-
-  testAsync("asynchronous test") { env =>
-    import verify.platform.ExecutionContext.Implicits.global
-
-    Future(env).map(_ + 1).map { result =>
-      assertEquals(result, env + 1)
-    }
+  object Implicits {
+    implicit val global: ExecutionContext = ExecutionContext.global
   }
 }

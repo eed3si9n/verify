@@ -1,6 +1,6 @@
 package example.sourcecodetest
 
-import cutest.BasicTestSuite
+import verify.BasicTestSuite
 
 object TextTests extends BasicTestSuite {
   test("foo(1)") {
@@ -20,5 +20,5 @@ object TextTests extends BasicTestSuite {
     assert(foo { println("Hello"); "lol".toString * 2 } == ("lollol", "\"lol\".toString * 2"))
   }
 
-  def foo[T](v: cutest.sourcecode.Text[T]) = (v.value, v.source)
+  def foo[T](v: verify.sourcecode.Text[T]) = (v.value, v.source)
 }

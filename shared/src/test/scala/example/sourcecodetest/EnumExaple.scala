@@ -1,7 +1,7 @@
 package example.sourcecodetest
 
-import cutest.sourcecode.Name
-import cutest._
+import verify.sourcecode.Name
+import verify._
 
 object EnumExaple extends BasicTestSuite {
   case class EnumValue(name: String) {
