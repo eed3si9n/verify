@@ -12,7 +12,7 @@
 
 package verify
 
-import verify.platform.{ ExecutionContext, Future }
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.control.NonFatal
 import verify.Utils.silent
 

@@ -13,7 +13,7 @@
 package example.tests
 
 import verify.TestSuite
-import verify.platform.Future
+import scala.concurrent.Future
 import scala.util.Random
 
 object EnvironmentTest extends TestSuite[Int] {
@@ -34,7 +34,7 @@ object EnvironmentTest extends TestSuite[Int] {
   }
 
   testAsync("asynchronous test") { env =>
-    import verify.platform.ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
 
     Future(env).map(_ + 1).map { result =>
       assert(result == env + 1)

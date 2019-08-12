@@ -13,7 +13,7 @@
 package example.tests
 
 import verify.BasicTestSuite
-import verify.platform.Future
+import scala.concurrent.Future
 
 object SimpleTest extends BasicTestSuite {
   test("ignored test") {
@@ -67,7 +67,7 @@ object SimpleTest extends BasicTestSuite {
   }
 
   testAsync("asynchronous test") {
-    import verify.platform.ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
 
     Future(1).map(_ + 1).map { result =>
       assert(result == 2)

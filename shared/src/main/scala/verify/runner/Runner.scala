@@ -13,18 +13,20 @@
 package verify.runner
 
 import sbt.testing.{ Runner => BaseRunner, Task => BaseTask, _ }
+import scala.concurrent.ExecutionContext
 
 final class Runner(
     val args: Array[String],
     val remoteArgs: Array[String],
     val options: Options,
+    val ec: ExecutionContext,
     classLoader: ClassLoader
 ) extends BaseRunner {
 
   def done(): String = ""
 
   def tasks(list: Array[TaskDef]): Array[BaseTask] = {
-    list.map(t => new Task(t, options, classLoader))
+    list.map(t => new Task(t, options, classLoader, ec))
   }
 
   def receiveMessage(msg: String): Option[String] = {
@@ -35,5 +37,5 @@ final class Runner(
     serializer(task.taskDef())
 
   def deserializeTask(task: String, deserializer: String => TaskDef): BaseTask =
-    new Task(deserializer(task), options, classLoader)
+    new Task(deserializer(task), options, classLoader, ec)
 }
