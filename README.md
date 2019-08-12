@@ -31,12 +31,15 @@ Here's a simple test:
 import verify._
 
 object SomethingTest extends BasicTestSuite {
-  test("should be") {
-    assertEquals(2, 1 + 1)
+  test("addition") {
+    assert(2 == 1 + 1)
   }
 
-  test("should not be") {
-    assert(1 + 1 != 3)
+  test("failing test") {
+    case class Person(name: String = "Fred", age: Int = 42) {
+      def say(words: String*) = words.mkString(" ")
+    }
+    assert(Person().say("ping", "poing") == "pong pong")
   }
 
   test("should throw") {
@@ -47,13 +50,23 @@ object SomethingTest extends BasicTestSuite {
       test()
     }
   }
-
-  test("test result of") {
-    assertResult("hello world") {
-      "hello" + " " + "world"
-    }
-  }
 }
+```
+
+In the context of `BasicTestSuite`, `assert(...)` function is wired up to power assertion,
+as known in Groovy. In the above, the failing test would result to the following:
+
+```
+- failing test *** FAILED ***
+  assertion failed
+
+  assert(Person().say("ping", "poing") == "pong pong")
+         |        |                    |
+         |        ping poing           false
+         Person(Fred,42)
+    verify.asserts.PowerAssert$AssertListener.expressionRecorded(PowerAssert.scala:38)
+    verify.asserts.RecorderRuntime.recordExpression(RecorderRuntime.scala:39)
+    example.tests.SimpleTest$.$anonfun$new$9(SimpleTest.scala:54)
 ```
 
 In case you want to setup an environment for each test example and need `setup` and
@@ -113,7 +126,7 @@ object SomethingTest extends BasicTestSuite {
     val future = Future(100).map(_+1)
 
     for (result <- future) yield {
-      assertEquals(result, 101)
+      assert(result == 101)
     }
   }
 }

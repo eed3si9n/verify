@@ -14,7 +14,7 @@ package verify
 
 import verify.platform._
 
-trait BasicTestSuite extends AbstractTestSuite with Asserts {
+trait BasicTestSuite extends AbstractTestSuite with Assertion {
   def test(name: String)(f: => Void): Unit =
     synchronized {
       if (isInitialized) throw initError()
