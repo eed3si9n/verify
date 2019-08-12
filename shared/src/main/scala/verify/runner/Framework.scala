@@ -17,7 +17,7 @@ import sbt.testing.{ Framework => BaseFramework, _ }
 import scala.concurrent.ExecutionContext
 
 class Framework extends BaseFramework {
-  lazy val ec: ExecutionContext = ExecutionContext.global
+  lazy val ec: ExecutionContext = verify.platform.defaultExecutionContext
 
   def name(): String = "verify"
 

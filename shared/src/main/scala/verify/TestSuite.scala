@@ -42,7 +42,7 @@ trait TestSuite[Env] extends AbstractTestSuite with Assertion {
       Properties(setup _, (env: Env) => { tearDown(env); Void.UnitRef }, setupSuite _, tearDownSuite _, propertiesSeq)
     }
 
-  def executionContext: ExecutionContext = ExecutionContext.global
+  def executionContext: ExecutionContext = verify.platform.defaultExecutionContext
 
   private[this] var propertiesSeq = Seq.empty[TestSpec[Env, Unit]]
   private[this] var isInitialized = false

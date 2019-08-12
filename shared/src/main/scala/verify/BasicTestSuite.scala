@@ -35,7 +35,7 @@ trait BasicTestSuite extends AbstractTestSuite with Assertion {
       Properties[Unit](() => (), _ => Void.UnitRef, () => (), () => (), propertiesSeq)
     }
 
-  def executionContext: ExecutionContext = ExecutionContext.global
+  def executionContext: ExecutionContext = verify.platform.defaultExecutionContext
 
   private[this] var propertiesSeq = Seq.empty[TestSpec[Unit, Unit]]
   private[this] var isInitialized = false
