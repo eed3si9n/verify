@@ -13,8 +13,11 @@
 package verify
 
 import scala.scalanative.testinterface.PreloadedClassLoader
+import scala.concurrent.ExecutionContext
 
 package object platform {
+  val defaultExecutionContext: ExecutionContext = ExecutionContext.global
+
   type EnableReflectiveInstantiation =
     scala.scalajs.reflect.annotation.EnableReflectiveInstantiation
 

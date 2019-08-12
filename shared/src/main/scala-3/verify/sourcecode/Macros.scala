@@ -66,9 +66,11 @@ abstract class TextMacros {
   inline def apply[T](v: T): Text[T] = ${Macros.text[T]('v)}
 }
 
+/*
 abstract class ArgsMacros {
   inline given as Args = ${Macros.argsImpl}
 }
+*/
 
 object Util{
   def isSynthetic(qctx: QuoteContext)(s: qctx.tasty.Symbol): Boolean = isSyntheticName(getName(qctx)(s))
@@ -175,6 +177,7 @@ object Macros {
     '{ Pkg(${Util.literal(qctx)(path)}) }
   }
 
+  /*
   def argsImpl given (qctx: QuoteContext): Expr[Args] = {
     import qctx.tasty._
     // import quoted._
@@ -209,6 +212,7 @@ object Macros {
     val seqss = '{ Seq(${ Repeated(textSeqs.map(_.unseal).toList, '[Seq[Text[_]]].unseal).seal.asInstanceOf[Expr[Seq[Seq[Text[_]]]]] }: _*) }
     '{ Args($seqss) }
   }
+  */
 
   def text[T: Type](v: Expr[T]) given (qctx: QuoteContext): Expr[sourcecode.Text[T]] = {
     import qctx.tasty._

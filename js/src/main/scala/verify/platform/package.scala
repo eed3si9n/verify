@@ -13,6 +13,7 @@
 package verify
 
 import org.portablescala.reflect.Reflect
+import scala.concurrent.ExecutionContext
 
 /**
  * The `platform` package provides the required Scala types for
@@ -21,6 +22,7 @@ import org.portablescala.reflect.Reflect
  */
 package object platform {
   val Await = scala.concurrent.Await
+  val defaultExecutionContext: ExecutionContext = ExecutionContext.global
 
   type EnableReflectiveInstantiation =
     org.portablescala.reflect.annotation.EnableReflectiveInstantiation

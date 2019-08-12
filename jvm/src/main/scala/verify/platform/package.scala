@@ -12,6 +12,9 @@
 
 package verify
 
+import java.util.concurrent.ForkJoinPool
+import scala.concurrent.ExecutionContext
+
 /**
  * The `platform` package provides the required Scala types for
  * source-level compatibility between JVM/JS and Native, along with
@@ -19,6 +22,7 @@ package verify
  */
 package object platform {
   val Await = scala.concurrent.Await
+  lazy val defaultExecutionContext: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool)
 
   type EnableReflectiveInstantiation = verify.internal.EnableReflectiveInstantiation
 
