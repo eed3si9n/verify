@@ -14,7 +14,7 @@ package verify
 
 import verify.platform._
 
-trait TestSuite[Env] extends AbstractTestSuite with Asserts {
+trait TestSuite[Env] extends AbstractTestSuite with Assertion {
   def setupSuite(): Unit = ()
   def tearDownSuite(): Unit = ()
   def setup(): Env

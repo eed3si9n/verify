@@ -17,7 +17,7 @@
 
 package example.tests
 
-import verify.{ AssertionException, BasicTestSuite }
+import verify.BasicTestSuite
 import verify.platform.Future
 
 object SimpleTest extends BasicTestSuite {
@@ -47,31 +47,18 @@ object SimpleTest extends BasicTestSuite {
     assert(hello == "hello", "assertion with hint is failing")
   }
 
-  test("assert result without message") {
-    assertResult("hello world") {
-      "hello" + " world"
-    }
-  }
-
-  test("assert result with message") {
-    assertResult("hello world", "expecting hello failed ({0} != {1})") {
-      "hello" + " world"
-    }
-  }
-
-  test("assert equals") {
-    assertEquals(2, 1 + 1)
-  }
+  // test("failing test") {
+  //   case class Person(name: String = "Fred", age: Int = 42) {
+  //     def say(words: String*) = words.mkString(" ")
+  //   }
+  //   assert(Person().say("ping", "poing") == "pong pong")
+  // }
 
   test("assert equals with nulls") {
     val s: String = null
 
-    intercept[AssertionException] {
-      assertEquals(s, "dummy")
-    }
-
-    intercept[AssertionException] {
-      assertEquals("dummy", s)
+    intercept[AssertionError] {
+      assert(s == "dummy")
     }
   }
 
@@ -88,14 +75,14 @@ object SimpleTest extends BasicTestSuite {
     import verify.platform.ExecutionContext.Implicits.global
 
     Future(1).map(_ + 1).map { result =>
-      assertEquals(result, 2)
+      assert(result == 2)
     }
   }
 
   test("intercept failure") {
     class DummyException extends RuntimeException
 
-    intercept[AssertionException] {
+    intercept[AssertionError] {
       intercept[DummyException] {
         def hello(x: Int) = x + 1
         if (hello(1) != 2) throw new DummyException
@@ -105,7 +92,7 @@ object SimpleTest extends BasicTestSuite {
 
   test("fail()") {
     def x = 1
-    intercept[AssertionException] { if (x == 1) fail() }
+    intercept[AssertionError] { if (x == 1) fail() }
   }
 
   test("fail(reason)") {
@@ -114,8 +101,8 @@ object SimpleTest extends BasicTestSuite {
       if (x == 1) fail("dummy")
       false
     } catch {
-      case ex: AssertionException =>
-        ex.message == "dummy"
+      case ex: AssertionError =>
+        ex.getMessage == "dummy"
     }
 
     assert(isSuccess)

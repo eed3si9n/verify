@@ -72,8 +72,8 @@ object Result {
   }
 
   def from(error: Throwable): Result[Nothing] = error match {
-    case ex: AssertionException =>
-      Result.Failure(ex.message, Some(ex), Some(ex.location))
+    case ex: AssertionError =>
+      Result.Failure(ex.getMessage, Some(ex), None)
     case ex: UnexpectedException =>
       Result.Exception(ex.reason, Some(ex.location))
     case ex: InterceptException =>

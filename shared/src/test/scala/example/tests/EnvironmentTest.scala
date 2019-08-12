@@ -35,14 +35,14 @@ object EnvironmentTest extends TestSuite[Int] {
   override def tearDownSuite() = {}
 
   test("simple test") { env =>
-    assertEquals(env, env)
+    assert(env == env)
   }
 
   testAsync("asynchronous test") { env =>
     import verify.platform.ExecutionContext.Implicits.global
 
     Future(env).map(_ + 1).map { result =>
-      assertEquals(result, env + 1)
+      assert(result == env + 1)
     }
   }
 }
