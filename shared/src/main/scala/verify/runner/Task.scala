@@ -16,9 +16,9 @@ package runner
 import sbt.testing.{ Task => BaseTask, _ }
 import scala.compat.Platform.EOL
 import scala.concurrent.duration.Duration
-import scala.concurrent.{ Await, ExecutionContext, Future, Promise }
+import scala.concurrent.{ ExecutionContext, Future, Promise }
 import scala.util.Try
-import verify.platform.loadModule
+import verify.platform.{ Await, loadModule }
 
 final class Task(task: TaskDef, opts: Options, cl: ClassLoader, execContext: ExecutionContext) extends BaseTask {
   private[this] implicit lazy val ec: ExecutionContext = execContext

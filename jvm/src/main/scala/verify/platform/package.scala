@@ -18,6 +18,8 @@ package verify
  * utilities with a platform-specific implementation.
  */
 package object platform {
+  val Await = scala.concurrent.Await
+
   type EnableReflectiveInstantiation = verify.internal.EnableReflectiveInstantiation
 
   private[verify] def loadModule(name: String, loader: ClassLoader): Any = {
