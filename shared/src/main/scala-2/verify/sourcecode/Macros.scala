@@ -61,9 +61,11 @@ trait TextMacros {
   def apply[T](v: T): Text[T] = macro Macros.text[T]
 }
 
+/*
 trait ArgsMacros {
   implicit def scalaVerifySourcecodeArgs: Args = macro Macros.argsImpl
 }
+ */
 
 object Util {
   def isSynthetic(c: Compat.Context)(s: c.Symbol) = isSyntheticName(getName(c)(s))
@@ -135,6 +137,7 @@ object Macros {
 
   def pkgImpl(c: Compat.Context): c.Expr[Pkg] = enclosing[Pkg](c)(_.isPackage)
 
+  /*
   def argsImpl(c: Compat.Context): c.Expr[Args] = {
     import c.universe._
     val param = Compat.enclosingParamList(c)
@@ -142,6 +145,7 @@ object Macros {
     val textSeqs = texts.map(s => c.Expr(q"""Seq(..$s)"""))
     c.Expr[Args](q"""Seq(..$textSeqs)""")
   }
+   */
 
   def text[T: c.WeakTypeTag](c: Compat.Context)(v: c.Expr[T]): c.Expr[sourcecode.Text[T]] = {
     import c.universe._

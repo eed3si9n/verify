@@ -63,5 +63,7 @@ object Pkg extends PkgMacros with SourceCompanion[String, Pkg](new Pkg(_))
 case class Text[T](value: T, source: String)
 object Text extends TextMacros
 
+/*
 case class Args(value: Seq[Seq[Text[_]]]) extends SourceValue[Seq[Seq[Text[_]]]]
 object Args extends ArgsMacros with SourceCompanion[Seq[Seq[Text[_]]], Args](new Args(_))
+*/
