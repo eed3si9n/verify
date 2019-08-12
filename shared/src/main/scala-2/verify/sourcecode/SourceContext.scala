@@ -17,8 +17,10 @@ abstract class SourceValue[T] {
   def value: T
 }
 abstract class SourceCompanion[T, V <: SourceValue[T]](build: T => V) {
+  import scala.language.implicitConversions
+
   def apply()(implicit s: V): T = s.value
-  implicit def wrap(s: T): V = build(s)
+  implicit def toScalaVerifySourcecodeSourceValue(s: T): V = build(s)
 }
 
 case class Name(value: String) extends SourceValue[String]
@@ -44,7 +46,11 @@ object Line extends SourceCompanion[Int, Line](new Line(_)) with LineMacros
 
 case class SourceLocation(fileName: String, filePath: String, line: Int)
 object SourceLocation {
-  implicit def sourceLocation(implicit n: SourceFileName, p: SourceFilePath, l: Line): SourceLocation =
+  implicit def toScalaVerifySourcecodeSourceLocation(
+      implicit n: SourceFileName,
+      p: SourceFilePath,
+      l: Line
+  ): SourceLocation =
     SourceLocation(n.value, p.value, l.value)
   def apply()(implicit s: SourceLocation): SourceLocation = s
 }

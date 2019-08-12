@@ -115,7 +115,7 @@ object SomethingTest extends TestSuite[Int] {
 }
 ```
 
-Minitest supports asynchronous results in tests, use `testAsync` and
+scala-verify supports asynchronous results in tests, use `testAsync` and
 return a `Future[Unit]`:
 
 ```scala

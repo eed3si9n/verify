@@ -332,7 +332,7 @@ assert(person.age == 43, "something something")
   }
 
   def outputs(rendering: String)(expectation: => Unit): Unit = {
-    def normalize(s: String) = augmentString(s.trim()).lines.mkString
+    def normalize(s: String) = augmentString(s.trim()).linesIterator.toList.mkString
 
     try {
       expectation
