@@ -70,7 +70,7 @@ object Util {
   def isSyntheticName(name: String) = {
     name == "<init>" || (name.startsWith("<local ") && name.endsWith(">"))
   }
-  def getName(c: Compat.Context)(s: c.Symbol) = s.name.decoded.toString.trim
+  def getName(c: Compat.Context)(s: c.Symbol) = s.name.decodedName.toString.trim
 }
 
 object Macros {
@@ -153,6 +153,7 @@ object Macros {
           case p          => p.startOrPoint
         }
     }.min
+    import scala.language.existentials
     val g = c.asInstanceOf[reflect.macros.runtime.Context].global
     val parser = g.newUnitParser(fileContent.drop(start))
     parser.expr()
