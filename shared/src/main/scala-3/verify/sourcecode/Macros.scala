@@ -62,7 +62,7 @@ abstract class TextMacros {
   //   inline def apply(v: T): Text[T] = ${Macros.text[T]('v)}
   // }
   import scala.language.implicitConversions
-  inline implicit def generate[T](v: T): Text[T] = ${Macros.text[T]('v)}
+  inline implicit def toScalaVerifySourcecodeText[T](v: T): Text[T] = ${Macros.text[T]('v)}
   inline def apply[T](v: T): Text[T] = ${Macros.text[T]('v)}
 }
 

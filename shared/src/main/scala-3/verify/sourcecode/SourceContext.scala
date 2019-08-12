@@ -45,7 +45,7 @@ object Line extends LineMacros with SourceCompanion[Int, Line](new Line(_))
 case class SourceLocation(fileName: String, filePath: String, line: Int)
 object SourceLocation {
   import scala.language.implicitConversions
-  implicit def sourcecodeSourceLocation(implicit n: SourceFileName, p: SourceFilePath, l: Line): SourceLocation =
+  implicit def toScalaVerifySourcecodeSourceLocation(implicit n: SourceFileName, p: SourceFilePath, l: Line): SourceLocation =
     SourceLocation(n.value, p.value, l.value)
 
   def apply() given SourceLocation: SourceLocation = the[SourceLocation]

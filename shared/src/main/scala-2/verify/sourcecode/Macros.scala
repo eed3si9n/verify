@@ -16,52 +16,53 @@ package sourcecode
 import language.experimental.macros
 
 trait NameMacros {
-  implicit def generate: Name = macro Macros.nameImpl
+  implicit def scalaVerifySourcecodeName: Name = macro Macros.nameImpl
 }
 
 trait NameMachineMacros {
-  implicit def generate: Name.Machine = macro Macros.nameMachineImpl
+  implicit def scalaVerifySourcecodeNameMachine: Name.Machine = macro Macros.nameMachineImpl
 }
 
 trait FullNameMacros {
-  implicit def generate: FullName = macro Macros.fullNameImpl
+  implicit def scalaVerifySourcecodeFullName: FullName = macro Macros.fullNameImpl
 }
 
 trait FullNameMachineMacros {
-  implicit def generate: FullName.Machine = macro Macros.fullNameMachineImpl
+  implicit def scalaVerifySourcecodeFullNameMachine: FullName.Machine = macro Macros.fullNameMachineImpl
 }
 
 trait SourceFileNameMacros {
-  implicit def generate: SourceFileName = macro Macros.sourceFileNameImpl
+  implicit def scalaVerifySourcecodeSourceFileName: SourceFileName = macro Macros.sourceFileNameImpl
 }
 
 trait SourceFilePathMacros {
-  implicit def generate: SourceFilePath = macro Macros.sourceFilePathImpl
+  implicit def scalaVerifySourcecodeSourceFilePath: SourceFilePath = macro Macros.sourceFilePathImpl
 }
 
 trait LineMacros {
-  implicit def generate: sourcecode.Line = macro Macros.lineImpl
+  implicit def scalaVerifySourcecodeLine: sourcecode.Line = macro Macros.lineImpl
 }
 
 trait EnclosingMacros {
-  implicit def generate: Enclosing = macro Macros.enclosingImpl
+  implicit def scalaVerifySourcecodeEnclosing: Enclosing = macro Macros.enclosingImpl
 }
 
 trait EnclosingMachineMacros {
-  implicit def generate: Enclosing.Machine = macro Macros.enclosingMachineImpl
+  implicit def scalaVerifySourcecodeEnclosingMachine: Enclosing.Machine = macro Macros.enclosingMachineImpl
 }
 
 trait PkgMacros {
-  implicit def generate: Pkg = macro Macros.pkgImpl
+  implicit def scalaVerifySourcecodePkg: Pkg = macro Macros.pkgImpl
 }
 
 trait TextMacros {
-  implicit def generate[T](v: T): Text[T] = macro Macros.text[T]
+  import scala.language.implicitConversions
+  implicit def toScalaVerifySourcecodeText[T](v: T): Text[T] = macro Macros.text[T]
   def apply[T](v: T): Text[T] = macro Macros.text[T]
 }
 
 trait ArgsMacros {
-  implicit def generate: Args = macro Macros.argsImpl
+  implicit def scalaVerifySourcecodeArgs: Args = macro Macros.argsImpl
 }
 
 object Util {

@@ -39,7 +39,7 @@ object Void {
   final case class Caught[A](ref: A, location: SourceLocation) extends Void
 
   /** Implicit conversion that boxes everything except for `Unit`. */
-  implicit def toVoid[A](ref: A)(implicit location: SourceLocation): Void =
+  implicit def toScalaVerifyVoid[A](ref: A)(implicit location: SourceLocation): Void =
     ref match {
       case () => Void.UnitRef
       case _  => Void.Caught(ref, location)
