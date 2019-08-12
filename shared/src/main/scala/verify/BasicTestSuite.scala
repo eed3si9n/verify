@@ -12,9 +12,11 @@
 
 package verify
 
-import verify.platform._
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait BasicTestSuite extends AbstractTestSuite with Assertion {
+  private[this] implicit lazy val ec: ExecutionContext = executionContext
+
   def test(name: String)(f: => Void): Unit =
     synchronized {
       if (isInitialized) throw initError()
@@ -33,10 +35,10 @@ trait BasicTestSuite extends AbstractTestSuite with Assertion {
       Properties[Unit](() => (), _ => Void.UnitRef, () => (), () => (), propertiesSeq)
     }
 
+  def executionContext: ExecutionContext = ExecutionContext.global
+
   private[this] var propertiesSeq = Seq.empty[TestSpec[Unit, Unit]]
   private[this] var isInitialized = false
-  private[this] implicit lazy val ec: ExecutionContext =
-    DefaultExecutionContext
 
   private[this] def initError() =
     new AssertionError(

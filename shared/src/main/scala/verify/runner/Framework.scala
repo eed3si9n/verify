@@ -14,8 +14,11 @@ package verify.runner
 
 import verify.runner.Framework.ModuleFingerprint
 import sbt.testing.{ Framework => BaseFramework, _ }
+import scala.concurrent.ExecutionContext
 
 class Framework extends BaseFramework {
+  lazy val ec: ExecutionContext = ExecutionContext.global
+
   def name(): String = "verify"
 
   def options: Options = Options()
@@ -24,7 +27,7 @@ class Framework extends BaseFramework {
     Array(ModuleFingerprint)
 
   def runner(args: Array[String], remoteArgs: Array[String], testClassLoader: ClassLoader): Runner =
-    new verify.runner.Runner(args, remoteArgs, options, testClassLoader)
+    new verify.runner.Runner(args, remoteArgs, options, ec, testClassLoader)
 
   def slaveRunner(
       args: Array[String],

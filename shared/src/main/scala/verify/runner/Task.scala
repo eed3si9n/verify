@@ -16,11 +16,12 @@ package runner
 import sbt.testing.{ Task => BaseTask, _ }
 import scala.compat.Platform.EOL
 import scala.concurrent.duration.Duration
-import verify.platform._
+import scala.concurrent.{ ExecutionContext, Future, Promise }
 import scala.util.Try
+import verify.platform.{ Await, loadModule }
 
-final class Task(task: TaskDef, opts: Options, cl: ClassLoader) extends BaseTask {
-  implicit val ec: ExecutionContext = DefaultExecutionContext
+final class Task(task: TaskDef, opts: Options, cl: ClassLoader, execContext: ExecutionContext) extends BaseTask {
+  private[this] implicit lazy val ec: ExecutionContext = execContext
   private[this] val console = if (opts.useSbtLogging) None else Some(Array(new ConsoleLogger))
 
   def tags(): Array[String] = Array.empty

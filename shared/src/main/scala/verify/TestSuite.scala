@@ -12,9 +12,11 @@
 
 package verify
 
-import verify.platform._
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait TestSuite[Env] extends AbstractTestSuite with Assertion {
+  private[this] implicit lazy val ec: ExecutionContext = executionContext
+
   def setupSuite(): Unit = ()
   def tearDownSuite(): Unit = ()
   def setup(): Env
@@ -40,11 +42,10 @@ trait TestSuite[Env] extends AbstractTestSuite with Assertion {
       Properties(setup _, (env: Env) => { tearDown(env); Void.UnitRef }, setupSuite _, tearDownSuite _, propertiesSeq)
     }
 
+  def executionContext: ExecutionContext = ExecutionContext.global
+
   private[this] var propertiesSeq = Seq.empty[TestSpec[Env, Unit]]
   private[this] var isInitialized = false
-  private[this] implicit lazy val ec: ExecutionContext =
-    DefaultExecutionContext
-
   private[this] def initError() =
     new AssertionError(
       "Cannot define new tests after TestSuite was initialized"

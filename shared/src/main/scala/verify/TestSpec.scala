@@ -12,7 +12,7 @@
 
 package verify
 
-import verify.platform.{ ExecutionContext, Future, Promise }
+import scala.concurrent.{ ExecutionContext, Future, Promise }
 import scala.util.control.NonFatal
 import scala.util.{ Failure, Success }
 import verify.sourcecode.SourceLocation
