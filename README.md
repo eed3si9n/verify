@@ -1,7 +1,7 @@
 scala-verify
 ============
 
-scala-verify is a fork of [Minitest](https://github.com/monix/minitest) to prepare for eventual merge into scala/scala.
+scala-verify is a fork of [Minitest](https://github.com/monix/minitest) + [SourceCode](https://github.com/lihaoyi/sourcecode) to prepare for eventual merge into scala/scala.
 The purpose of scala-verify is to create a cross-platform, zero-dependency, minimal, testing framework for bootstrapping the toolchain and a small handful of foundational third-party libraries.
 See https://github.com/scala/scala-dev/issues/641.
 
@@ -15,9 +15,9 @@ For `build.sbt` (use the `%%%` operator for Scala.js):
 
 ```scala
 // use the %%% operator for Scala.js
-libraryDependencies += "io.monix" %% "minitest" % "2.5.0" % "test"
+libraryDependencies += "com.eed3si9n.verify" %% "verify" % "0.1.0" % Test
 
-testFrameworks += new TestFramework("minitest.runner.Framework")
+testFrameworks += new TestFramework("verify.runner.Framework")
 ```
 
 ## Tutorial
