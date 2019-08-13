@@ -15,8 +15,6 @@ import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 // shadow sbt-scalajs' crossProject and CrossType until Scala.js 1.0.0 is released
 import sbtcrossproject.{ crossProject, CrossType }
-import sbt.Keys._
-import com.typesafe.sbt.GitVersioning
 
 addCommandAlias("ci-all", ";+clean ;+test:compile ;+test ;+package")
 addCommandAlias("release", ";+clean ;+verifyNative/clean ;+publishSigned ;+verifyNative/publishSigned")
@@ -51,27 +49,11 @@ ThisBuild / headerLicense := Some(
 val ReleaseTag = """^v(\d+\.\d+\.\d+(?:[-.]\w+)?)$""".r
 
 lazy val verifyRoot = (project in file("."))
-  .enablePlugins(GitVersioning)
   .aggregate(verifyJVM, verifyJS)
   .settings(
     name := "verify root",
     Compile / sources := Nil,
-    skip in publish := true,
-    /* The BaseVersion setting represents the in-development (upcoming) version,
-     * as an alternative to SNAPSHOTS.
-     */
-    git.baseVersion := "2.5.0",
-    git.gitTagToVersionNumber := {
-      case ReleaseTag(v) => Some(v)
-      case _             => None
-    },
-    git.formattedShaVersion := {
-      val suffix = git.makeUncommittedSignifierSuffix(git.gitUncommittedChanges.value, git.uncommittedSignifier.value)
-
-      git.gitHeadCommit.value map { _.substring(0, 7) } map { sha =>
-        git.baseVersion.value + "-" + sha + suffix
-      }
-    }
+    publish / skip := true
   )
 
 lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file("."))
