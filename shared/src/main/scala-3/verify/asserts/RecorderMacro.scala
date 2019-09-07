@@ -17,8 +17,6 @@ import scala.quoted._
 import scala.tasty._
 
 object RecorderMacro {
-  implicit val toolbox: scala.quoted.Toolbox = scala.quoted.Toolbox.make(getClass.getClassLoader)
-
   def apply[R: Type, A: Type](
       recording: Expr[R],
       listener: Expr[RecorderListener[R, A]]) given (qctx: QuoteContext): Expr[A] = {
