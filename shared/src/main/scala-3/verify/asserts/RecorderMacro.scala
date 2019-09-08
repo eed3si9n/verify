@@ -17,16 +17,17 @@ import scala.quoted._
 import scala.tasty._
 
 object RecorderMacro {
-  def apply[R: Type, A: Type](
-      recording: Expr[R],
-      listener: Expr[RecorderListener[R, A]]) given (qctx: QuoteContext): Expr[A] = {
+  /** captures a method invocation in the shape of assert(expr, message). */
+  def apply[A: Type, R: Type](
+      recording: Expr[A],
+      listener: Expr[RecorderListener[A, R]]) given (qctx: QuoteContext): Expr[R] = {
     apply(recording, '{""}, listener)
   }
 
-  def apply[R: Type, A: Type](
-      recording: Expr[R],
+  def apply[A: Type, R: Type](
+      recording: Expr[A],
       message: Expr[String],
-      listener: Expr[RecorderListener[R, A]]) given (qctx: QuoteContext): Expr[A] = {
+      listener: Expr[RecorderListener[A, R]]) given (qctx: QuoteContext): Expr[R] = {
     import qctx.tasty._
     val termArg: Term = recording.unseal.underlyingArgument
 
@@ -36,7 +37,7 @@ object RecorderMacro {
     }
 
     '{
-      val recorderRuntime: RecorderRuntime[R, A] = new RecorderRuntime($listener)
+      val recorderRuntime: RecorderRuntime[A, R] = new RecorderRuntime($listener)
       recorderRuntime.recordMessage($message)
       ${
         val runtimeSym = '[RecorderRuntime[_, _]].unseal.symbol match {
@@ -150,7 +151,7 @@ object RecorderMacro {
         Block(
           recordExpressions(termArg),
           '{ recorderRuntime.completeRecording() }.unseal
-        ).seal.cast[A]
+        ).seal.cast[R]
       }
     }
   }
