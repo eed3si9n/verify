@@ -100,7 +100,7 @@ Instrumented AST: ${showRaw(instrumented)}")
 
   private[this] def recordSubValues(expr: Tree): Tree = expr match {
     case Apply(x, ys)     => Apply(recordAllValues(x), ys.map(recordAllValues))
-    case TypeApply(x, ys) => recordValue(TypeApply(recordSubValues(x), ys), expr)
+    case TypeApply(x, ys) => TypeApply(recordSubValues(x), ys)
     case Select(x, y)     => Select(recordAllValues(x), y)
     case _                => expr
   }
