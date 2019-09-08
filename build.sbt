@@ -188,7 +188,7 @@ lazy val sharedSettings = Seq(
       Nil
   }),
   resolvers ++= Seq(
-    "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases"
+    "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases"
   ),
   testFrameworks := Seq(new TestFramework("verify.runner.Framework")),
   headerLicense := (ThisBuild / headerLicense).value
