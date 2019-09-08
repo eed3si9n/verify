@@ -47,13 +47,13 @@ class RecorderMacro[C <: Context](val context: C) {
   }
 
   private[this] def recordExpressions(recording: Tree): List[Tree] = {
-    val text = getText(recording)
+    val source = getSourceCode(recording)
     val ast = showRaw(recording)
     try {
-      List(resetValues, recordExpression(text, ast, recording))
+      List(resetValues, recordExpression(source, ast, recording))
     } catch {
       case e: Throwable =>
-        throw new RuntimeException("Expecty: Error rewriting expression.\nText: " + text + "\nAST : " + ast, e)
+        throw new RuntimeException("Expecty: Error rewriting expression.\nText: " + source + "\nAST : " + ast, e)
     }
   }
 
@@ -75,18 +75,17 @@ class RecorderMacro[C <: Context](val context: C) {
       List()
     )
 
-  private[this] def recordExpression(text: String, ast: String, expr: Tree) = {
+  private[this] def recordExpression(source: String, ast: String, expr: Tree) = {
     val instrumented = recordAllValues(expr)
     log(expr, s"""
-Expression      : ${text.trim()}
+Expression      : ${source.trim()}
 Original AST    : $ast
 Instrumented AST: ${showRaw(instrumented)}")
 
     """)
-
     Apply(
       Select(Ident(termName(context)("$scala_verify_recorderRuntime")), termName(context)("recordExpression")),
-      List(context.literal(text).tree, context.literal(ast).tree, instrumented)
+      List(context.literal(source).tree, context.literal(ast).tree, instrumented)
     )
   }
 
@@ -114,7 +113,7 @@ Instrumented AST: ${showRaw(instrumented)}")
       )
     else expr
 
-  private[this] def getText(expr: Tree): String = getPosition(expr).lineContent
+  private[this] def getSourceCode(expr: Tree): String = getPosition(expr).lineContent
 
   private[this] def getAnchor(expr: Tree): Int = expr match {
     case Apply(x, ys)     => getAnchor(x) + 0

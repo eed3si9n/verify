@@ -30,7 +30,7 @@ object RecorderMacro {
     import qctx.tasty._
     val termArg: Term = recording.unseal.underlyingArgument
 
-    def getText(expr: Tree): String = {
+    def getSourceCode(expr: Tree): String = {
       val pos = expr.pos
       (" " * pos.startColumn) + pos.sourceCode
     }
@@ -52,24 +52,24 @@ object RecorderMacro {
         }
 
         def recordExpressions(recording: Term): List[Term] = {
-          val text = getText(recording)
+          val source = getSourceCode(recording)
           val ast = recording.showExtractors
           try {
             List(
               '{ recorderRuntime.resetValues() }.unseal,
-              recordExpression(text, ast, recording)
+              recordExpression(source, ast, recording)
             )
           } catch {
             case e: Throwable => throw new RuntimeException(
-              "Expecty: Error rewriting expression.\nText: " + text + "\nAST : " + ast, e)
+              "Expecty: Error rewriting expression.\nText: " + source + "\nAST : " + ast, e)
           }
         }
 
-        def recordExpression(text: String, ast: String, expr: Term): Term = {
+        def recordExpression(source: String, ast: String, expr: Term): Term = {
           val instrumented = recordAllValues(expr)
           Apply(recordExpressionSel,
             List(
-              Literal(Constant(text)),
+              Literal(Constant(source)),
               Literal(Constant(ast)),
               instrumented
             ))
