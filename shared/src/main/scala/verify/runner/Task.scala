@@ -22,13 +22,12 @@ import verify.platform.{ Await, loadModule }
 
 final class Task(task: TaskDef, opts: Options, cl: ClassLoader, execContext: ExecutionContext) extends BaseTask {
   private[this] implicit lazy val ec: ExecutionContext = execContext
-  private[this] val console = if (opts.useSbtLogging) None else Some(Array(new ConsoleLogger))
 
   def tags(): Array[String] = Array.empty
   def taskDef(): TaskDef = task
 
   def reportStart(name: String, loggers: Array[Logger]): Unit = {
-    for (logger <- console.getOrElse(loggers)) {
+    for (logger <- loggers) {
       val withColors = logger.ansiCodesSupported()
       val color = if (withColors) Console.GREEN else ""
       val reset = if (withColors) Console.RESET else ""
@@ -37,7 +36,7 @@ final class Task(task: TaskDef, opts: Options, cl: ClassLoader, execContext: Exe
   }
 
   def report(name: String, r: Result[_], loggers: Array[Logger]): Unit = {
-    for (logger <- console.getOrElse(loggers)) {
+    for (logger <- loggers) {
       logger.info(r.formatted(name, logger.ansiCodesSupported()))
     }
   }
