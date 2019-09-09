@@ -23,32 +23,30 @@ object DiffUtil {
   val ansiColorToken: Char = '\u001b'
 
   @tailrec private def splitTokens(str: String, acc: List[String] = Nil): List[String] =
-      if (str == "")
-        acc.reverse
-      else {
-        val head = str.charAt(0)
-        val (token, rest) =
-          if (head == ansiColorToken) { // ansi color token
-            val splitIndex = str.indexOf('m') + 1
-            (str.substring(0, splitIndex), str.substring(splitIndex))
+    if (str == "")
+      acc.reverse
+    else {
+      val head = str.charAt(0)
+      val (token, rest) =
+        if (head == ansiColorToken) { // ansi color token
+          val splitIndex = str.indexOf('m') + 1
+          (str.substring(0, splitIndex), str.substring(splitIndex))
+        } else if (Character.isAlphabetic(head) || Character.isDigit(head))
+          str.span(c => Character.isAlphabetic(c) || Character.isDigit(c) && c != ansiColorToken)
+        else if (Character.isMirrored(head) || Character.isWhitespace(head))
+          str.splitAt(1)
+        else
+          str.span { c =>
+            !Character.isAlphabetic(c) && !Character.isDigit(c) &&
+            !Character.isMirrored(c) && !Character.isWhitespace(c) && c != ansiColorToken
           }
-          else if (Character.isAlphabetic(head) || Character.isDigit(head))
-            str.span(c => Character.isAlphabetic(c) || Character.isDigit(c) && c != ansiColorToken)
-          else if (Character.isMirrored(head) || Character.isWhitespace(head))
-            str.splitAt(1)
-          else
-            str.span { c =>
-              !Character.isAlphabetic(c) && !Character.isDigit(c) &&
-                !Character.isMirrored(c) && !Character.isWhitespace(c) && c != ansiColorToken
-            }
-        splitTokens(rest, token :: acc)
-      }
-
+      splitTokens(rest, token :: acc)
+    }
 
   /** @return a tuple of the (found, expected, changedPercentage) diffs as strings */
   def mkColoredTypeDiff(found: String, expected: String): (String, String, Double) = {
     var totalChange = 0
-    val foundTokens   = splitTokens(found, Nil).toArray
+    val foundTokens = splitTokens(found, Nil).toArray
     val expectedTokens = splitTokens(expected, Nil).toArray
 
     val diffExp = hirschberg(foundTokens, expectedTokens)
@@ -81,13 +79,31 @@ object DiffUtil {
    *         differences are highlighted.
    */
   def mkColoredLineDiff(expected: Seq[String], actual: Seq[String]): String = {
-    val expectedSize = EOF.length max expected.maxBy(_.length).length
-    actual.padTo(expected.length, "").zip(expected.padTo(actual.length, "")).map { case (act, exp) =>
-      mkColoredLineDiff(exp, act, expectedSize)
-    }.mkString(System.lineSeparator)
+    val diffs =
+      actual
+        .padTo(expected.length, "")
+        .zip(expected.padTo(actual.length, ""))
+        .map {
+          case (act, exp) =>
+            mkColoredLineDiff(exp, act)
+        }
+
+    padDiffs(diffs).mkString(System.lineSeparator)
   }
 
-  def mkColoredLineDiff(expected: String, actual: String, expectedSize: Int): String = {
+  def padDiffs(diffs: Seq[(String, String)]): Seq[String] = {
+    // skip ANSI control sequence
+    def textLength(str: String): Int = str.replaceAll("\u001b\\[[\\d;]*[^\\d;]", "").length
+    val expectedSize = EOF.length max textLength(diffs.maxBy(diff => textLength(diff._1))._1)
+    println(expectedSize)
+    diffs map {
+      case (expected, found) =>
+        val pad = " " * 0.max(expectedSize - textLength(expected))
+        expected + pad + "  |  " + found
+    }
+  }
+
+  def mkColoredLineDiff(expected: String, actual: String): (String, String) = {
     lazy val diff = {
       val tokens = splitTokens(expected, Nil).toArray
       val lastTokens = splitTokens(actual, Nil).toArray
@@ -96,25 +112,25 @@ object DiffUtil {
 
     val expectedDiff =
       if (expected eq EOF) eof()
-      else diff.collect {
-        case Unmodified(str) => str
-        case Inserted(str) => added(str)
-        case Modified(_, str) => added(str)
-        case Deleted(_) => ""
-      }.mkString
+      else
+        diff.collect {
+          case Unmodified(str)  => str
+          case Inserted(str)    => added(str)
+          case Modified(_, str) => added(str)
+          case Deleted(_)       => ""
+        }.mkString
 
     val actualDiff =
       if (actual eq EOF) eof()
-      else diff.collect {
-        case Unmodified(str) => str
-        case Inserted(_) => ""
-        case Modified(str, _) => deleted(str)
-        case Deleted(str) => deleted(str)
-      }.mkString
+      else
+        diff.collect {
+          case Unmodified(str)  => str
+          case Inserted(_)      => ""
+          case Modified(str, _) => deleted(str)
+          case Deleted(str)     => deleted(str)
+        }.mkString
 
-    val pad = " " * 0.max(expectedSize - expected.length)
-
-    expectedDiff + pad + "  |  " + actualDiff
+    (expectedDiff, actualDiff)
   }
 
   def mkColoredCodeDiff(code: String, lastCode: String, printDiffDel: Boolean): String = {
@@ -124,7 +140,7 @@ object DiffUtil {
     val diff = hirschberg(lastTokens, tokens)
 
     diff.collect {
-      case Unmodified(str) => str
+      case Unmodified(str)                    => str
       case Inserted(str)                      => added(str)
       case Modified(old, str) if printDiffDel => deleted(str) + added(str)
       case Modified(_, str)                   => added(str)
@@ -140,9 +156,8 @@ object DiffUtil {
       val (spaces, rest) = str.span(_ == '\n')
       if (spaces.isEmpty) {
         val (text, rest2) = str.span(_ != '\n')
-        Console.BOLD + color + text + Console.RESET + bgColored(rest2, color)
-      }
-      else spaces + bgColored(rest, color)
+        Console.BOLD + color + "[" + text + "]" + Console.RESET + bgColored(rest2, color)
+      } else spaces + bgColored(rest, color)
     }
   private def eof() = "\u001B[51m" + "EOF" + Console.RESET
 
@@ -222,23 +237,20 @@ object DiffUtil {
     var alignment = List.empty[Patch]
     var i = x.length
     var j = y.length
-    while (i > 0 || j > 0)
-      if (i > 0 && j > 0 && score(i)(j) == score(i - 1)(j - 1) + similarity(x(i - 1), y(j - 1))) {
-        val newHead =
-          if (x(i - 1) == y(j - 1)) Unmodified(x(i - 1))
-          else Modified(x(i - 1), y(j - 1))
-        alignment = newHead :: alignment
-        i = i - 1
-        j = j - 1
-      }
-      else if (i > 0 && score(i)(j) == score(i - 1)(j) + d) {
-        alignment = Deleted(x(i - 1)) :: alignment
-        i = i - 1
-      }
-      else {
-        alignment = Inserted(y(j - 1)) :: alignment
-        j = j - 1
-      }
+    while (i > 0 || j > 0) if (i > 0 && j > 0 && score(i)(j) == score(i - 1)(j - 1) + similarity(x(i - 1), y(j - 1))) {
+      val newHead =
+        if (x(i - 1) == y(j - 1)) Unmodified(x(i - 1))
+        else Modified(x(i - 1), y(j - 1))
+      alignment = newHead :: alignment
+      i = i - 1
+      j = j - 1
+    } else if (i > 0 && score(i)(j) == score(i - 1)(j) + d) {
+      alignment = Deleted(x(i - 1)) :: alignment
+      i = i - 1
+    } else {
+      alignment = Inserted(y(j - 1)) :: alignment
+      j = j - 1
+    }
     builder ++= alignment
   }
 }

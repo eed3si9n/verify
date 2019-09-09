@@ -354,12 +354,12 @@ assert(person.age == 43, "something something")
            | |
            | a pig! 'tis in ourselves that we are thus or thus....
            virtue! a pig! 'tis in ourselves that we are thus or thus....
-virtue! a fig! 'tis in ourselves that we are thus or thus.                 |  virtue! a pig! 'tis in ourselves that we are thus or thus.
-our bodies are our gardens, to the which our wills are gardeners: so that  |  our bodies are our gardens, to the which our wills are gardeners; so that
-if we will plant nettles, or sow lettuce, set hyssop and weed up thyme,    |  if we will plant nettles, or sow cabbage, set hyssop and weed up thyme,
-supply it with one gender of herbs, or distract it with many, either to    |  supply it with one gender of herbs, or distract it with many, either to
-have it sterile with idleness, or manured with industry, why, the power    |  have it sterile with idleness, or manured with industry, why, the power
-and corrigible authority of this lies in our wills.                        |  and corrigible authority of this lies in our wills.
+virtue! a [fig]! 'tis in ourselves that we are thus or thus.                 |  virtue! a [pig]! 'tis in ourselves that we are thus or thus.
+our bodies are our gardens, to the which our wills are gardeners[:] so that  |  our bodies are our gardens, to the which our wills are gardeners[;] so that
+if we will plant nettles, or sow [lettuce], set hyssop and weed up thyme,    |  if we will plant nettles, or sow [cabbage], set hyssop and weed up thyme,
+supply it with one gender of herbs, or distract it with many, either to      |  supply it with one gender of herbs, or distract it with many, either to
+have it sterile with idleness, or manured with industry, why, the power      |  have it sterile with idleness, or manured with industry, why, the power
+and corrigible authority of this lies in our wills.                          |  and corrigible authority of this lies in our wills.
       """
       ) {
         assertEquals(str1, "virtue! " + str2)
@@ -372,12 +372,12 @@ assertEquals(str1, "virtue! " + str2)
                               | |
                               | a pig! 'tis in ourselves that we are thus or thus....
                               virtue! a pig! 'tis in ourselves that we are thus or thus....
-virtue! a fig! 'tis in ourselves that we are thus or thus.                 |  virtue! a pig! 'tis in ourselves that we are thus or thus.
-our bodies are our gardens, to the which our wills are gardeners: so that  |  our bodies are our gardens, to the which our wills are gardeners; so that
-if we will plant nettles, or sow lettuce, set hyssop and weed up thyme,    |  if we will plant nettles, or sow cabbage, set hyssop and weed up thyme,
-supply it with one gender of herbs, or distract it with many, either to    |  supply it with one gender of herbs, or distract it with many, either to
-have it sterile with idleness, or manured with industry, why, the power    |  have it sterile with idleness, or manured with industry, why, the power
-and corrigible authority of this lies in our wills.                        |  and corrigible authority of this lies in our wills.
+virtue! a [fig]! 'tis in ourselves that we are thus or thus.                 |  virtue! a [pig]! 'tis in ourselves that we are thus or thus.
+our bodies are our gardens, to the which our wills are gardeners[:] so that  |  our bodies are our gardens, to the which our wills are gardeners[;] so that
+if we will plant nettles, or sow [lettuce], set hyssop and weed up thyme,    |  if we will plant nettles, or sow [cabbage], set hyssop and weed up thyme,
+supply it with one gender of herbs, or distract it with many, either to      |  supply it with one gender of herbs, or distract it with many, either to
+have it sterile with idleness, or manured with industry, why, the power      |  have it sterile with idleness, or manured with industry, why, the power
+and corrigible authority of this lies in our wills.                          |  and corrigible authority of this lies in our wills.
       """
       ) {
         assertEquals(str1, "virtue! " + str2)
