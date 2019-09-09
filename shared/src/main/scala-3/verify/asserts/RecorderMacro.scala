@@ -199,4 +199,12 @@ object StringRecorderMacro {
       found: Expr[String],
       listener: Expr[RecorderListener[String, R]]) given (qctx: QuoteContext): Expr[R] =
     new RecorderMacro(qctx).apply2[String, R](expected, found, '{""}, listener)
+
+  /** captures a method invocation in the shape of assertEquals(expected, found). */
+  def apply[R: Type](
+      expected: Expr[String],
+      found: Expr[String],
+      message: Expr[String],
+      listener: Expr[RecorderListener[String, R]]) given (qctx: QuoteContext): Expr[R] =
+    new RecorderMacro(qctx).apply2[String, R](expected, found, message, listener)
 }

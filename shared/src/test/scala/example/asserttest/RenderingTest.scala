@@ -348,7 +348,7 @@ assert(person.age == 43, "something something")
 
     if (isDotty) {
       outputs(
-        """assertion failed
+        """assertion failed: custom message
 
 "virtue! " + str2
            | |
@@ -362,7 +362,7 @@ have it sterile with idleness, or manured with industry, why, the power      |  
 and corrigible authority of this lies in our wills.                          |  and corrigible authority of this lies in our wills.
       """
       ) {
-        assertEquals(str1, "virtue! " + str2)
+        assertEquals(str1, "virtue! " + str2, "custom message")
       }
     } else {
       outputs(

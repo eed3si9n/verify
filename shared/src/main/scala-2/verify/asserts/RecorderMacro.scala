@@ -32,11 +32,15 @@ class RecorderMacro[C <: Context](val context: C) {
   }
 
   /** captures a method invocation in the shape of assertEquals(expected, found). */
-  def apply2[A: context.WeakTypeTag, R: context.WeakTypeTag](expected: context.Tree, found: context.Tree): Expr[R] = {
+  def apply2[A: context.WeakTypeTag, R: context.WeakTypeTag](
+      expected: context.Tree,
+      found: context.Tree,
+      message: context.Tree
+  ): Expr[R] = {
     context.Expr(
       Block(
         declareRuntime[A, R]("stringAssertEqualsListener") ::
-          // recordMessage(message) ::
+          recordMessage(message) ::
           recordExpressions(expected) :::
           recordExpressions(found),
         completeRecording
@@ -180,6 +184,14 @@ object StringRecorderMacro {
   def apply[A: context.WeakTypeTag, R: context.WeakTypeTag](
       context: Context
   )(expected: context.Tree, found: context.Tree): context.Expr[R] = {
-    new RecorderMacro[context.type](context).apply2[A, R](expected, found)
+    new RecorderMacro[context.type](context).apply2[A, R](expected, found, context.literal("").tree)
+  }
+}
+
+object StringRecorderMacroMessage {
+  def apply[A: context.WeakTypeTag, R: context.WeakTypeTag](
+      context: Context
+  )(expected: context.Tree, found: context.Tree, message: context.Tree): context.Expr[R] = {
+    new RecorderMacro[context.type](context).apply2[A, R](expected, found, message)
   }
 }

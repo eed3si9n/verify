@@ -18,5 +18,6 @@ import language.experimental.macros
 trait AssertEquals[R] {
   protected def stringAssertEqualsListener: RecorderListener[String, R]
   def assertEquals(expected: String, found: String): R = macro StringRecorderMacro.apply[String, R]
-  // def apply(value: A, message: => String): R = macro RecorderMacro.apply[A, R]
+  def assertEquals(expected: String, found: String, message: => String): R =
+    macro StringRecorderMacroMessage.apply[String, R]
 }
