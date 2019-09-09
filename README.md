@@ -15,12 +15,14 @@ For `build.sbt` (use the `%%%` operator for Scala.js):
 
 ```scala
 // use the %%% operator for Scala.js
-libraryDependencies += "com.eed3si9n.verify" %% "verify" % "0.1.0" % Test
+libraryDependencies += "com.eed3si9n.verify" %% "verify" % "0.2.0" % Test
 
 testFrameworks += new TestFramework("verify.runner.Framework")
 ```
 
 ## Tutorial
+
+### BasicTestSuite
 
 Test suites MUST BE objects, not classes. To create a test suite without `setup` and `teardown`,
 extend [BasicTestSuite](shared/src/main/scala/verify/BasicTestSuite.scala) trait:
@@ -69,6 +71,15 @@ as known in Groovy. In the above, the failing test would result to the following
     example.tests.SimpleTest$.$anonfun$new$9(SimpleTest.scala:54)
 ```
 
+### assertions
+
+For the most part, `assert(...)` should do the job.
+
+To compare large strings, scala-verify also provides `assertEquals(expected: String, found: String, message: => String)`.
+In case of an error, it will print the diff in color for easier detection of the differences.
+
+### setup and tearDown
+
 In case you want to setup an environment for each test example and need `setup` and
 `tearDown` semantics, per test example, extend [TestSuite](shared/src/main/scala/verify/TestSuite.scala).
 Then on each `test` definition, you'll receive a fresh value:
@@ -114,6 +125,8 @@ object SomethingTest extends TestSuite[Int] {
   }
 }
 ```
+
+### asynchronous testing
 
 scala-verify supports asynchronous results in tests, use `testAsync` and
 return a `Future[Unit]`:
