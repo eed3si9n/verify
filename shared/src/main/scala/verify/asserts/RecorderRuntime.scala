@@ -35,6 +35,7 @@ class RecorderRuntime[A, R](listener: RecorderListener[A, R]) {
   }
 
   def recordExpression(text: String, ast: String, value: A): Unit = {
+    // recordedValues.reverse causes <function2> to slip in
     val recordedExpr = RecordedExpression(text, ast, value, recordedValues)
     resetValues()
     listener.expressionRecorded(recordedExpr, recordedMessage)
@@ -42,8 +43,7 @@ class RecorderRuntime[A, R](listener: RecorderListener[A, R]) {
   }
 
   def completeRecording(): R = {
-    val lastRecorded = recordedExprs.head
-    val recording = Recording(lastRecorded.value, recordedExprs)
+    val recording = Recording(recordedExprs.reverse)
     val msg = recordedMessage
     listener.recordingCompleted(recording, msg)
   }

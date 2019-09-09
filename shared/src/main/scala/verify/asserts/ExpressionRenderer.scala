@@ -16,15 +16,16 @@ package asserts
 import collection.mutable.ListBuffer
 import collection.immutable.TreeMap
 
-class ExpressionRenderer(showTypes: Boolean) {
+class ExpressionRenderer(showTypes: Boolean, shortString: Boolean) {
   def render(recordedExpr: RecordedExpression[_]): String = {
     val offset = recordedExpr.text.prefixLength(_.isWhitespace)
     val intro = new StringBuilder().append(recordedExpr.text.trim())
     val lines = ListBuffer(new StringBuilder)
 
     val rightToLeft = filterAndSortByAnchor(recordedExpr.recordedValues)
-    for (recordedValue <- rightToLeft)
+    for (recordedValue <- rightToLeft) {
       placeValue(lines, recordedValue.value, math.max(recordedValue.anchor - offset, 0))
+    }
 
     lines.prepend(intro)
     lines.append(new StringBuilder)
@@ -67,7 +68,11 @@ class ExpressionRenderer(showTypes: Boolean) {
   }
 
   private[this] def renderValue(value: Any): String = {
-    val str = if (value == null) "null" else value.toString
+    val str0 = if (value == null) "null" else value.toString
+    val str =
+      if (!shortString) str0
+      else if (str0.contains("\n")) str0.linesIterator.toList.headOption.getOrElse("") + "..."
+      else str0
     if (showTypes) str + " (" + value.getClass.getName + ")" // TODO: get type name the Scala way
     else str
   }

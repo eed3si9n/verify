@@ -42,6 +42,27 @@ class RecorderMacro(qctx0: QuoteContext) {
     }
   }
 
+  def apply2[A: Type, R: Type](
+      expected: Expr[A],
+      found: Expr[A],
+      message: Expr[String],
+      listener: Expr[RecorderListener[A, R]]): Expr[R] = {
+    val expectedArg: Term = expected.unseal.underlyingArgument
+    val foundArg: Term = found.unseal.underlyingArgument
+    
+    '{
+      val recorderRuntime: RecorderRuntime[A, R] = new RecorderRuntime($listener)
+      recorderRuntime.recordMessage($message)
+      ${
+        Block(
+          recordExpressions('{ recorderRuntime }.unseal, expectedArg) :::
+          recordExpressions('{ recorderRuntime }.unseal, foundArg),
+          '{ recorderRuntime.completeRecording() }.unseal
+        ).seal.cast[R]
+      }
+    }
+  }
+
   private[this] def recordExpressions(runtime: Term, recording: Term): List[Term] = {
     val source = getSourceCode(recording)
     val ast = recording.showExtractors
@@ -169,4 +190,13 @@ object RecorderMacro {
       message: Expr[String],
       listener: Expr[RecorderListener[A, R]]) given (qctx: QuoteContext): Expr[R] =
     new RecorderMacro(qctx).apply(recording, message, listener)
+}
+
+object StringRecorderMacro {
+  /** captures a method invocation in the shape of assertEquals(expected, found). */
+  def apply[R: Type](
+      expected: Expr[String],
+      found: Expr[String],
+      listener: Expr[RecorderListener[String, R]]) given (qctx: QuoteContext): Expr[R] =
+    new RecorderMacro(qctx).apply2[String, R](expected, found, '{""}, listener)
 }

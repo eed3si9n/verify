@@ -331,6 +331,60 @@ assert(person.age == 43, "something something")
     }
   }
 
+  test("long string") {
+    val str1 = """virtue! a fig! 'tis in ourselves that we are thus or thus.
+    |our bodies are our gardens, to the which our wills are gardeners: so that
+    |if we will plant nettles, or sow lettuce, set hyssop and weed up thyme,
+    |supply it with one gender of herbs, or distract it with many, either to
+    |have it sterile with idleness, or manured with industry, why, the power
+    |and corrigible authority of this lies in our wills.""".stripMargin
+
+    val str2 = """a pig! 'tis in ourselves that we are thus or thus.
+    |our bodies are our gardens, to the which our wills are gardeners; so that
+    |if we will plant nettles, or sow cabbage, set hyssop and weed up thyme,
+    |supply it with one gender of herbs, or distract it with many, either to
+    |have it sterile with idleness, or manured with industry, why, the power
+    |and corrigible authority of this lies in our wills.""".stripMargin
+
+    if (isDotty) {
+      outputs(
+        """assertion failed
+
+"virtue! " + str2
+           | |
+           | a pig! 'tis in ourselves that we are thus or thus....
+           virtue! a pig! 'tis in ourselves that we are thus or thus....
+virtue! a fig! 'tis in ourselves that we are thus or thus.                 |  virtue! a pig! 'tis in ourselves that we are thus or thus.
+our bodies are our gardens, to the which our wills are gardeners: so that  |  our bodies are our gardens, to the which our wills are gardeners; so that
+if we will plant nettles, or sow lettuce, set hyssop and weed up thyme,    |  if we will plant nettles, or sow cabbage, set hyssop and weed up thyme,
+supply it with one gender of herbs, or distract it with many, either to    |  supply it with one gender of herbs, or distract it with many, either to
+have it sterile with idleness, or manured with industry, why, the power    |  have it sterile with idleness, or manured with industry, why, the power
+and corrigible authority of this lies in our wills.                        |  and corrigible authority of this lies in our wills.
+      """
+      ) {
+        assertEquals(str1, "virtue! " + str2)
+      }
+    } else {
+      outputs(
+        """assertion failed
+
+assertEquals(str1, "virtue! " + str2)
+                              | |
+                              | a pig! 'tis in ourselves that we are thus or thus....
+                              virtue! a pig! 'tis in ourselves that we are thus or thus....
+virtue! a fig! 'tis in ourselves that we are thus or thus.                 |  virtue! a pig! 'tis in ourselves that we are thus or thus.
+our bodies are our gardens, to the which our wills are gardeners: so that  |  our bodies are our gardens, to the which our wills are gardeners; so that
+if we will plant nettles, or sow lettuce, set hyssop and weed up thyme,    |  if we will plant nettles, or sow cabbage, set hyssop and weed up thyme,
+supply it with one gender of herbs, or distract it with many, either to    |  supply it with one gender of herbs, or distract it with many, either to
+have it sterile with idleness, or manured with industry, why, the power    |  have it sterile with idleness, or manured with industry, why, the power
+and corrigible authority of this lies in our wills.                        |  and corrigible authority of this lies in our wills.
+      """
+      ) {
+        assertEquals(str1, "virtue! " + str2)
+      }
+    }
+  }
+
   def outputs(rendering: String)(expectation: => Unit): Unit = {
     def normalize(s: String) = augmentString(s.trim()).linesIterator.toList.mkString
 
@@ -340,7 +394,9 @@ assert(person.age == 43, "something something")
     } catch {
       case e: AssertionError => {
         val expected = normalize(rendering)
-        val actual = normalize(e.getMessage).replaceAll("@[0-9a-f]*", "@\\.\\.\\.")
+        val actual = normalize(e.getMessage)
+          .replaceAll("@[0-9a-f]*", "@\\.\\.\\.")
+          .replaceAll("\u001b\\[[\\d;]*[^\\d;]", "")
         if (actual != expected) {
           throw new AssertionError(s"""Expectation output doesn't match: ${e.getMessage}
                |expected = $expected

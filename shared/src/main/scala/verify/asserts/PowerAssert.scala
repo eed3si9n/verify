@@ -19,14 +19,13 @@ package asserts
  */
 class PowerAssert extends Recorder[Boolean, Unit] {
   val failEarly: Boolean = true
-  val showTypes: Boolean = false
 
   class AssertListener extends RecorderListener[Boolean, Unit] {
     override def expressionRecorded(
         recordedExpr: RecordedExpression[Boolean],
         recordedMessage: Function0[String]
     ): Unit = {
-      lazy val rendering: String = new ExpressionRenderer(showTypes).render(recordedExpr)
+      lazy val rendering: String = new ExpressionRenderer(showTypes = false, shortString = false).render(recordedExpr)
       // println(recordedExpr.ast + "\n")
       // if (printExprs) println(rendering)
       if (!recordedExpr.value && failEarly) {
@@ -47,4 +46,34 @@ class PowerAssert extends Recorder[Boolean, Unit] {
 
 object PowerAssert {
   lazy val assert: PowerAssert = new PowerAssert()
+
+  lazy val stringAssertEqualsListener: RecorderListener[String, Unit] = new StringAssertEqualsListener
+  class StringAssertEqualsListener extends RecorderListener[String, Unit] {
+    val showTypes: Boolean = false
+    override def recordingCompleted(recording: Recording[String], recordedMessage: Function0[String]) = {
+      recording.recordedExprs match {
+        case expected :: found :: Nil =>
+          if (expected.value == found.value) ()
+          else {
+            lazy val rendering: String = new ExpressionRenderer(showTypes = false, shortString = true).render(found)
+            val msg = recordedMessage()
+            val header =
+              "assertion failed" +
+                (if (msg == "") ""
+                 else ": " + msg)
+
+            val expectedLines = expected.value.linesIterator.toSeq
+            val foundLines = found.value.linesIterator.toSeq
+            val diff = DiffUtil
+              .mkColoredLineDiff(expectedLines, foundLines)
+              .linesIterator
+              .toSeq
+              .map(str => Console.RESET.toString + str)
+              .mkString("\n")
+            throw new AssertionError(header + "\n\n" + rendering + diff)
+          }
+        case _ => throw new RuntimeException("unexpected number of expressions " + recording)
+      }
+    }
+  }
 }

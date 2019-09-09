@@ -13,4 +13,10 @@
 package verify
 package asserts
 
-case class Recording[A](recordedExprs: List[RecordedExpression[A]]) {}
+import language.experimental.macros
+
+trait AssertEquals[R] {
+  protected def stringAssertEqualsListener: RecorderListener[String, R]
+  inline def assertEquals(expected: String, found: String): R = 
+    ${ StringRecorderMacro.apply('expected, 'found, 'stringAssertEqualsListener) }
+}

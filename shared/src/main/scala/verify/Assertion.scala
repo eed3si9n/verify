@@ -14,9 +14,11 @@ package verify
 
 import scala.reflect.ClassTag
 import verify.sourcecode.SourceLocation
+import verify.asserts.PowerAssert
 
-trait Assertion {
-  lazy val assert: verify.asserts.PowerAssert = new verify.asserts.PowerAssert()
+trait Assertion extends asserts.AssertEquals[Unit] {
+  override protected def stringAssertEqualsListener = PowerAssert.stringAssertEqualsListener
+  lazy val assert: PowerAssert = new PowerAssert()
 
   def intercept[E <: Throwable: ClassTag](callback: => Unit)(implicit pos: SourceLocation): Unit = {
 

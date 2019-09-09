@@ -19,6 +19,7 @@ import scala.util.Properties
 class RecorderMacro[C <: Context](val context: C) {
   import context.universe._
 
+  /** captures a method invocation in the shape of assert(expr, message). */
   def apply[A: context.WeakTypeTag, R: context.WeakTypeTag](value: context.Tree, message: context.Tree): Expr[R] = {
     context.Expr(
       Block(
@@ -30,8 +31,34 @@ class RecorderMacro[C <: Context](val context: C) {
     )
   }
 
+  /** captures a method invocation in the shape of assertEquals(expected, found). */
+  def apply2[A: context.WeakTypeTag, R: context.WeakTypeTag](expected: context.Tree, found: context.Tree): Expr[R] = {
+    context.Expr(
+      Block(
+        declareRuntime[A, R]("stringAssertEqualsListener") ::
+          // recordMessage(message) ::
+          recordExpressions(expected) :::
+          recordExpressions(found),
+        completeRecording
+      )
+    )
+  }
+
   private[this] def termName(c: C)(s: String) =
     c.universe.TermName(s)
+
+  private[this] def declareRuntime[A: context.WeakTypeTag, R: context.WeakTypeTag](listener: String): Tree = {
+    val runtimeClass = context.mirror.staticClass(classOf[RecorderRuntime[_, _]].getName())
+    ValDef(
+      Modifiers(),
+      termName(context)("$scala_verify_recorderRuntime"),
+      TypeTree(weakTypeOf[RecorderRuntime[A, R]]),
+      Apply(
+        Select(New(Ident(runtimeClass)), termNames.CONSTRUCTOR),
+        List(Select(context.prefix.tree, termName(context)(listener)))
+      )
+    )
+  }
 
   private[this] def declareRuntime[A: context.WeakTypeTag, R: context.WeakTypeTag]: Tree = {
     val runtimeClass = context.mirror.staticClass(classOf[RecorderRuntime[_, _]].getName())
@@ -146,5 +173,13 @@ object RecorderMacro {
       context: Context
   )(value: context.Tree, message: context.Tree): context.Expr[R] = {
     new RecorderMacro[context.type](context).apply[A, R](value, message)
+  }
+}
+
+object StringRecorderMacro {
+  def apply[A: context.WeakTypeTag, R: context.WeakTypeTag](
+      context: Context
+  )(expected: context.Tree, found: context.Tree): context.Expr[R] = {
+    new RecorderMacro[context.type](context).apply2[A, R](expected, found)
   }
 }
