@@ -13,4 +13,4 @@
 package verify
 package asserts
 
-case class Recording[T](value: T, recordedExprs: List[RecordedExpression[T]]) {}
+case class Recording[A](recordedExprs: List[RecordedExpression[A]]) {}

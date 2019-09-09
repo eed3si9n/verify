@@ -14,9 +14,9 @@ package verify
 package asserts
 
 // one instance per recording
-class RecorderRuntime[R, A](listener: RecorderListener[R, A]) {
-  protected var recordedValues: List[RecordedValue] = _
-  protected var recordedExprs: List[RecordedExpression[R]] = List.empty
+class RecorderRuntime[A, R](listener: RecorderListener[A, R]) {
+  protected var recordedValues: List[RecordedValue] = List.empty
+  protected var recordedExprs: List[RecordedExpression[A]] = List.empty
   protected var recordedMessage: Function0[String] = () => ""
 
   def resetValues(): Unit = {
@@ -34,15 +34,17 @@ class RecorderRuntime[R, A](listener: RecorderListener[R, A]) {
     recordedMessage = () => message
   }
 
-  def recordExpression(text: String, ast: String, value: R): Unit = {
+  def recordExpression(text: String, ast: String, value: A): Unit = {
+    // recordedValues.reverse causes <function2> to slip in
     val recordedExpr = RecordedExpression(text, ast, value, recordedValues)
+    resetValues()
     listener.expressionRecorded(recordedExpr, recordedMessage)
     recordedExprs = recordedExpr :: recordedExprs
   }
 
-  def completeRecording(): A = {
-    val lastRecorded = recordedExprs.head
-    val recording = Recording(lastRecorded.value, recordedExprs)
-    listener.recordingCompleted(recording, recordedMessage)
+  def completeRecording(): R = {
+    val recording = Recording(recordedExprs.reverse)
+    val msg = recordedMessage
+    listener.recordingCompleted(recording, msg)
   }
 }
