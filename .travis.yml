@@ -39,7 +39,7 @@ install:
 
 script:
   - sbt ++2.11.12!    verifyJVM/test verifyJS/test
-  - sbt ++2.12.9!     verifyJVM/test verifyJS/test
+  - sbt ++2.12.10!    verifyJVM/test verifyJS/test
   - sbt ++2.13.0!     verifyJVM/test verifyJS/test
   - sbt ++0.17.0-RC1! verifyJVM/test
 
