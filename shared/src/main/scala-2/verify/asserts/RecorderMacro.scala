@@ -117,7 +117,7 @@ Instrumented AST: ${showRaw(instrumented)}")
     """)
     Apply(
       Select(Ident(termName(context)("$scala_verify_recorderRuntime")), termName(context)("recordExpression")),
-      List(context.literal(source).tree, context.literal(ast).tree, instrumented)
+      List(q"$source", q"$ast", instrumented)
     )
   }
 
@@ -168,7 +168,8 @@ object RecorderMacro1 {
   def apply[A: context.WeakTypeTag, R: context.WeakTypeTag](
       context: Context
   )(value: context.Tree): context.Expr[R] = {
-    new RecorderMacro[context.type](context).apply[A, R](value, context.literal("").tree)
+    import context.universe._
+    new RecorderMacro[context.type](context).apply[A, R](value, q"""""""")
   }
 }
 
@@ -184,7 +185,8 @@ object StringRecorderMacro {
   def apply[A: context.WeakTypeTag, R: context.WeakTypeTag](
       context: Context
   )(expected: context.Tree, found: context.Tree): context.Expr[R] = {
-    new RecorderMacro[context.type](context).apply2[A, R](expected, found, context.literal("").tree)
+    import context.universe._
+    new RecorderMacro[context.type](context).apply2[A, R](expected, found, q"""""""")
   }
 }
 

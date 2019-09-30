@@ -18,7 +18,7 @@ import collection.immutable.TreeMap
 
 class ExpressionRenderer(showTypes: Boolean, shortString: Boolean) {
   def render(recordedExpr: RecordedExpression[_]): String = {
-    val offset = recordedExpr.text.prefixLength(_.isWhitespace)
+    val offset = recordedExpr.text.segmentLength(_.isWhitespace, 0)
     val intro = new StringBuilder().append(recordedExpr.text.trim())
     val lines = ListBuffer(new StringBuilder)
 
@@ -54,17 +54,20 @@ class ExpressionRenderer(showTypes: Boolean, shortString: Boolean) {
 
     placeString(lines(0), "|", col)
 
-    for (line <- lines.drop(1)) {
-      if (fits(line, str, col)) {
-        placeString(line, str, col)
-        return
+    import util.control.Breaks._
+    breakable {
+      for (line <- lines.drop(1)) {
+        if (fits(line, str, col)) {
+          placeString(line, str, col)
+          break()
+        }
+        placeString(line, "|", col)
       }
-      placeString(line, "|", col)
-    }
 
-    val newLine = new StringBuilder()
-    placeString(newLine, str, col)
-    lines.append(newLine)
+      val newLine = new StringBuilder()
+      placeString(newLine, str, col)
+      lines.append(newLine)
+    }
   }
 
   private[this] def renderValue(value: Any): String = {
