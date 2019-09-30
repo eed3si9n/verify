@@ -154,7 +154,7 @@ object Macros {
       case treeVal =>
         treeVal.pos match {
           case NoPosition => Int.MaxValue
-          case p          => p.startOrPoint
+          case p          => p.start
         }
     }.min
     import scala.language.existentials

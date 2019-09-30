@@ -12,7 +12,7 @@
 
 package verify
 
-import scala.compat.Platform.EOL
+import java.lang.System.{ lineSeparator => EOL }
 import scala.Console.{ GREEN, RED, YELLOW, RESET }
 import verify.sourcecode.SourceLocation
 

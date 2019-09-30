@@ -14,7 +14,7 @@ package verify
 package runner
 
 import sbt.testing.{ Task => BaseTask, _ }
-import scala.compat.Platform.EOL
+import java.lang.System.{ lineSeparator => EOL }
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ ExecutionContext, Future, Promise }
 import scala.util.Try

@@ -22,7 +22,7 @@ object DiffUtil {
 
   val ansiColorToken: Char = '\u001b'
 
-  @tailrec private def splitTokens(str: String, acc: List[String] = Nil): List[String] =
+  @tailrec private def splitTokens(str: String, acc: List[String]): List[String] =
     if (str == "")
       acc.reverse
     else {
@@ -178,7 +178,6 @@ object DiffUtil {
       else {
         val xlen = x.length
         val xmid = xlen / 2
-        val ylen = y.length
 
         val (x1, x2) = x.splitAt(xmid)
         val leftScore = nwScore(x1, y)
