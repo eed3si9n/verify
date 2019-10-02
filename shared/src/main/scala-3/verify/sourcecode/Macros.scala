@@ -18,47 +18,47 @@ import scala.quoted._
 import scala.tasty._
 
 abstract class NameMacros {
-  inline given as Name = ${Macros.nameImpl}
+  inline given: Name = ${Macros.nameImpl}
 }
 
 abstract class NameMachineMacros {
-  inline given as Name.Machine = ${Macros.nameMachineImpl}
+  inline given: Name.Machine = ${Macros.nameMachineImpl}
 }
 
 abstract class FullNameMacros {
-  inline given as FullName = ${Macros.fullNameImpl}
+  inline given: FullName = ${Macros.fullNameImpl}
 }
 
 abstract class FullNameMachineMacros {
-  inline given as FullName.Machine = ${Macros.fullNameMachineImpl}
+  inline given: FullName.Machine = ${Macros.fullNameMachineImpl}
 }
 
 abstract class SourceFilePathMacros {
-  inline given as SourceFilePath = ${Macros.sourceFilePathImpl}
+  inline given: SourceFilePath = ${Macros.sourceFilePathImpl}
 }
 
 abstract class SourceFileNameMacros {
-  inline given as SourceFileName = ${Macros.sourceFileNameImpl}
+  inline given: SourceFileName = ${Macros.sourceFileNameImpl}
 }
 
 abstract class LineMacros {
-  inline given as sourcecode.Line = ${Macros.lineImpl}
+  inline given: sourcecode.Line = ${Macros.lineImpl}
 }
 
 abstract class EnclosingMacros {
-  inline given as Enclosing = ${Macros.enclosingImpl}
+  inline given: Enclosing = ${Macros.enclosingImpl}
 }
 
 abstract class EnclosingMachineMacros {
-  inline given as Enclosing.Machine = ${Macros.enclosingMachineImpl}
+  inline given: Enclosing.Machine = ${Macros.enclosingMachineImpl}
 }
 
 abstract class PkgMacros {
-  inline given as Pkg = ${Macros.pkgImpl}
+  inline given: Pkg = ${Macros.pkgImpl}
 }
 
 abstract class TextMacros {
-  // given [T] as Conversion[T, Text[T]] {
+  // given [T]: Conversion[T, Text[T]] {
   //   inline def apply(v: T): Text[T] = ${Macros.text[T]('v)}
   // }
   import scala.language.implicitConversions
@@ -68,7 +68,7 @@ abstract class TextMacros {
 
 /*
 abstract class ArgsMacros {
-  inline given as Args = ${Macros.argsImpl}
+  inline given: Args = ${Macros.argsImpl}
 }
 */
 
@@ -100,7 +100,7 @@ object Util{
 
 object Macros {
 
-  def nameImpl given (qctx: QuoteContext): Expr[Name] = {
+  def nameImpl(given qctx: QuoteContext): Expr[Name] = {
     import qctx.tasty._
     var owner = rootContext.owner
     while(Util.isSynthetic(qctx)(owner)) owner = owner.owner
@@ -108,14 +108,14 @@ object Macros {
     '{ Name(${Util.literal(qctx)(simpleName)}) }
   }
 
-  def nameMachineImpl given (qctx: QuoteContext): Expr[Name.Machine] = {
+  def nameMachineImpl(given qctx: QuoteContext): Expr[Name.Machine] = {
     import qctx.tasty._
     val owner = rootContext.owner
     val simpleName = Util.getName(qctx)(owner)
     '{ Name.Machine(${Util.literal(qctx)(simpleName)}) }
   }
 
-  def fullNameImpl given (qctx: QuoteContext): Expr[FullName] = {
+  def fullNameImpl(given qctx: QuoteContext): Expr[FullName] = {
     import qctx.tasty._
     val owner = rootContext.owner
     val fullName =
@@ -127,14 +127,14 @@ object Macros {
     '{ FullName(${Util.literal(qctx)(fullName)}) }
   }
 
-  def fullNameMachineImpl given (qctx: QuoteContext): Expr[FullName.Machine] = {
+  def fullNameMachineImpl(given qctx: QuoteContext): Expr[FullName.Machine] = {
     import qctx.tasty._
     val owner = rootContext.owner
     val fullName = owner.fullName.trim
     '{ FullName.Machine(${Util.literal(qctx)(fullName)}) }
   }
 
-  def sourceFileNameImpl given (qctx: QuoteContext): Expr[SourceFileName] = {
+  def sourceFileNameImpl(given qctx: QuoteContext): Expr[SourceFileName] = {
     import qctx.tasty._
     val name = Option(rootContext.source) match {
       case Some(file) => file.getFileName.toString
@@ -143,7 +143,7 @@ object Macros {
     '{ SourceFileName(${Util.literal(qctx)(name)}) }
   }
 
-  def sourceFilePathImpl given (qctx: QuoteContext): Expr[SourceFilePath] = {
+  def sourceFilePathImpl(given qctx: QuoteContext): Expr[SourceFilePath] = {
     import qctx.tasty._
     val path = Option(rootContext.source) match {
       case Some(file) => file.toString
@@ -152,23 +152,23 @@ object Macros {
     '{ SourceFilePath(${Util.literal(qctx)(path)}) }
   }
 
-  def lineImpl given (qctx: QuoteContext): Expr[Line] = {
+  def lineImpl(given qctx: QuoteContext): Expr[Line] = {
     import qctx.tasty._
     val line = rootPosition.startLine + 1
     '{ Line(${Util.literal(qctx)(line)}) }
   }
 
-  def enclosingImpl given (qctx: QuoteContext): Expr[Enclosing] = {
+  def enclosingImpl(given qctx: QuoteContext): Expr[Enclosing] = {
     val path = enclosing(qctx)(!Util.isSynthetic(qctx)(_))
     '{ Enclosing(${Util.literal(qctx)(path)}) }
   }
 
-  def enclosingMachineImpl given (qctx: QuoteContext): Expr[Enclosing.Machine] = {
+  def enclosingMachineImpl(given qctx: QuoteContext): Expr[Enclosing.Machine] = {
     val path = enclosing(qctx)(_ => true)
     '{ Enclosing.Machine(${Util.literal(qctx)(path)}) }
   }
 
-  def pkgImpl given (qctx: QuoteContext): Expr[Pkg] = {
+  def pkgImpl(given qctx: QuoteContext): Expr[Pkg] = {
     import qctx.tasty._
     val path = enclosing(qctx)(_ match {
       case IsPackageDefSymbol(_) => true
@@ -178,7 +178,7 @@ object Macros {
   }
 
   /*
-  def argsImpl given (qctx: QuoteContext): Expr[Args] = {
+  def argsImpl(given qctx: QuoteContext): Expr[Args] = {
     import qctx.tasty._
     // import quoted._
 
@@ -214,7 +214,7 @@ object Macros {
   }
   */
 
-  def text[T: Type](v: Expr[T]) given (qctx: QuoteContext): Expr[sourcecode.Text[T]] = {
+  def text[T: Type](v: Expr[T])(given qctx: QuoteContext): Expr[sourcecode.Text[T]] = {
     import qctx.tasty._
     '{ Text($v, ${Util.literal(qctx)(rootPosition.sourceCode)}) }
   }
