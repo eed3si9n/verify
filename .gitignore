@@ -27,3 +27,6 @@ project/plugins/project/
 .scala_dependencies
 .worksheet
 _site
+
+# Scala Native 0.4.0-M2 specific
+lowered.hnir

@@ -17,12 +17,27 @@ matrix:
         - echo sdkman_auto_answer=true > $HOME/.sdkman/etc/config
         - source "$HOME/.sdkman/bin/sdkman-init.sh"
         # Scala Native
-        - sudo apt-get update
         - curl https://raw.githubusercontent.com/scala-native/scala-native/master/scripts/travis_setup.sh | bash -x
       before_script:
         - sudo chmod +x /usr/local/bin/sbt
       script:
         - sbt ++${TRAVIS_SCALA_VERSION}! verifyNative/test
+  - scala: 2.11.12
+      sudo: required
+      before_install:
+        # SDKMAN instruction is repeated
+        # adding $HOME/.sdkman to cache would create an empty directory, which interferes with the initial installation
+        - "[[ -d $HOME/.sdkman/bin/ ]] || rm -rf $HOME/.sdkman/"
+        - curl -sL https://get.sdkman.io | bash
+        - echo sdkman_auto_answer=true > $HOME/.sdkman/etc/config
+        - source "$HOME/.sdkman/bin/sdkman-init.sh"
+        # Scala Native
+        - curl https://raw.githubusercontent.com/scala-native/scala-native/master/scripts/travis_setup.sh | bash -x
+      before_script:
+        - sudo chmod +x /usr/local/bin/sbt
+      script:
+        - sbt ++${TRAVIS_SCALA_VERSION}! verifyNative/test
+      env: SCALANATIVE_VERSION="0.4.0-M2"
 
 before_install:
   # adding $HOME/.sdkman to cache would create an empty directory, which interferes with the initial installation
