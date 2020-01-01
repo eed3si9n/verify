@@ -15,14 +15,12 @@ package asserts
 
 import scala.quoted._
 
-class RecorderMacro(qctx0: QuoteContext) {
-  import qctx0.tasty.{ Type => _, _ }
+class RecorderMacro(given qctx0: QuoteContext) {
+  // https://dotty.epfl.ch/docs/reference/metaprogramming/tasty-reflect.html#sealing-and-unsealing
+  import qctx0.tasty.{ Type => _, _, given }
+  import util._
 
-  given qctx: QuoteContext = qctx0
-
-  private[this] val runtimeSym = '[RecorderRuntime[_, _]].unseal.symbol match {
-    case IsClassDefSymbol(sym) => sym
-  }
+  private[this] val runtimeSym: Symbol = '[RecorderRuntime[_, _]].unseal.tpe.typeSymbol
 
   def apply[A: Type, R: Type](
       recording: Expr[A],
@@ -49,7 +47,7 @@ class RecorderMacro(qctx0: QuoteContext) {
       listener: Expr[RecorderListener[A, R]]): Expr[R] = {
     val expectedArg: Term = expected.unseal.underlyingArgument
     val foundArg: Term = found.unseal.underlyingArgument
-    
+
     '{
       val recorderRuntime: RecorderRuntime[A, R] = new RecorderRuntime($listener)
       recorderRuntime.recordMessage($message)
@@ -139,12 +137,14 @@ class RecorderMacro(qctx0: QuoteContext) {
         case _ => false
       }
 
-    def skipSelect(sym: Symbol): Boolean =
+    def skipSelect(sym: Symbol): Boolean = {
       (sym match {
-        case IsDefDefSymbol(sym) => sym.signature.paramSigs.nonEmpty
-        case IsValDefSymbol(sym) => skipIdent(sym)
+        case sym if sym.isDefDef => sym.signature.paramSigs.nonEmpty
+        case sym if sym.isValDef => skipIdent(sym)
         case _ => true
       })
+
+    }
     expr match {
       case Select(_, _) if skipSelect(expr.symbol) => expr
       case TypeApply(_, _) => expr
@@ -182,14 +182,14 @@ object RecorderMacro {
   def apply[A: Type, R: Type](
       recording: Expr[A],
       listener: Expr[RecorderListener[A, R]])(given qctx: QuoteContext): Expr[R] =
-    new RecorderMacro(qctx).apply(recording, '{""}, listener)
+    new RecorderMacro().apply(recording, '{""}, listener)
 
   /** captures a method invocation in the shape of assert(expr, message). */
   def apply[A: Type, R: Type](
       recording: Expr[A],
       message: Expr[String],
       listener: Expr[RecorderListener[A, R]])(given qctx: QuoteContext): Expr[R] =
-    new RecorderMacro(qctx).apply(recording, message, listener)
+    new RecorderMacro().apply(recording, message, listener)
 }
 
 object StringRecorderMacro {
@@ -198,7 +198,7 @@ object StringRecorderMacro {
       expected: Expr[String],
       found: Expr[String],
       listener: Expr[RecorderListener[String, R]])(given qctx: QuoteContext): Expr[R] =
-    new RecorderMacro(qctx).apply2[String, R](expected, found, '{""}, listener)
+    new RecorderMacro().apply2[String, R](expected, found, '{""}, listener)
 
   /** captures a method invocation in the shape of assertEquals(expected, found). */
   def apply[R: Type](
@@ -206,5 +206,5 @@ object StringRecorderMacro {
       found: Expr[String],
       message: Expr[String],
       listener: Expr[RecorderListener[String, R]])(given qctx: QuoteContext): Expr[R] =
-    new RecorderMacro(qctx).apply2[String, R](expected, found, message, listener)
+    new RecorderMacro().apply2[String, R](expected, found, message, listener)
 }

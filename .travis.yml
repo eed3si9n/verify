@@ -56,7 +56,7 @@ script:
   - sbt ++2.11.12!    verifyJVM/test verifyJS/test
   - sbt ++2.12.10!    verifyJVM/test verifyJS/test
   - sbt ++2.13.1!     verifyJVM/test verifyJS/test
-  - sbt ++0.19.0-RC1! verifyJVM/test
+  - sbt ++0.21.0-RC1! verifyJVM/test
 
 before_cache:
   - du -h -d 1 $HOME/.ivy2/cache
