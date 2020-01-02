@@ -22,7 +22,7 @@ matrix:
         - sudo chmod +x /usr/local/bin/sbt
       script:
         - sbt ++${TRAVIS_SCALA_VERSION}! verifyNative/test
-  - scala: 2.11.12
+    - scala: 2.11.12
       sudo: required
       before_install:
         # SDKMAN instruction is repeated
