@@ -1,6 +1,8 @@
 language: scala
 
 env:
+  global:
+    - ADOPTOPENJDK=8
   matrix:
     - ADOPTOPENJDK=8
     - ADOPTOPENJDK=11
