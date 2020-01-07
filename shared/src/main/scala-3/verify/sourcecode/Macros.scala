@@ -18,43 +18,43 @@ import scala.quoted._
 import scala.tasty._
 
 abstract class NameMacros {
-  inline given: Name = ${Macros.nameImpl}
+  inline given Name = ${Macros.nameImpl}
 }
 
 abstract class NameMachineMacros {
-  inline given: Name.Machine = ${Macros.nameMachineImpl}
+  inline given Name.Machine = ${Macros.nameMachineImpl}
 }
 
 abstract class FullNameMacros {
-  inline given: FullName = ${Macros.fullNameImpl}
+  inline given FullName = ${Macros.fullNameImpl}
 }
 
 abstract class FullNameMachineMacros {
-  inline given: FullName.Machine = ${Macros.fullNameMachineImpl}
+  inline given FullName.Machine = ${Macros.fullNameMachineImpl}
 }
 
 abstract class SourceFilePathMacros {
-  inline given: SourceFilePath = ${Macros.sourceFilePathImpl}
+  inline given SourceFilePath = ${Macros.sourceFilePathImpl}
 }
 
 abstract class SourceFileNameMacros {
-  inline given: SourceFileName = ${Macros.sourceFileNameImpl}
+  inline given SourceFileName = ${Macros.sourceFileNameImpl}
 }
 
 abstract class LineMacros {
-  inline given: sourcecode.Line = ${Macros.lineImpl}
+  inline given sourcecode.Line = ${Macros.lineImpl}
 }
 
 abstract class EnclosingMacros {
-  inline given: Enclosing = ${Macros.enclosingImpl}
+  inline given Enclosing = ${Macros.enclosingImpl}
 }
 
 abstract class EnclosingMachineMacros {
-  inline given: Enclosing.Machine = ${Macros.enclosingMachineImpl}
+  inline given Enclosing.Machine = ${Macros.enclosingMachineImpl}
 }
 
 abstract class PkgMacros {
-  inline given: Pkg = ${Macros.pkgImpl}
+  inline given Pkg = ${Macros.pkgImpl}
 }
 
 abstract class TextMacros {
@@ -78,7 +78,8 @@ object Util{
     name == "<init>" || (name.startsWith("<local ") && name.endsWith(">"))
   }
   def getName(qctx: QuoteContext)(s: qctx.tasty.Symbol): String = {
-    import qctx.tasty._
+    import qctx.tasty.{ _, given }
+    // https://github.com/lampepfl/dotty/blob/0.20.0-RC1/library/src/scala/tasty/reflect/SymbolOps.scala
     s.name.trim
   }
   def cleanName(name0: String): String = {
@@ -101,7 +102,7 @@ object Util{
 object Macros {
 
   def nameImpl(given qctx: QuoteContext): Expr[Name] = {
-    import qctx.tasty._
+    import qctx.tasty.{ _, given }
     var owner = rootContext.owner
     while(Util.isSynthetic(qctx)(owner)) owner = owner.owner
     val simpleName = Util.cleanName(Util.getName(qctx)(owner))
@@ -109,14 +110,14 @@ object Macros {
   }
 
   def nameMachineImpl(given qctx: QuoteContext): Expr[Name.Machine] = {
-    import qctx.tasty._
+    import qctx.tasty.{ _, given }
     val owner = rootContext.owner
     val simpleName = Util.getName(qctx)(owner)
     '{ Name.Machine(${Util.literal(qctx)(simpleName)}) }
   }
 
   def fullNameImpl(given qctx: QuoteContext): Expr[FullName] = {
-    import qctx.tasty._
+    import qctx.tasty.{ _, given }
     val owner = rootContext.owner
     val fullName =
       owner.fullName.trim
@@ -128,14 +129,14 @@ object Macros {
   }
 
   def fullNameMachineImpl(given qctx: QuoteContext): Expr[FullName.Machine] = {
-    import qctx.tasty._
+    import qctx.tasty.{ _, given }
     val owner = rootContext.owner
     val fullName = owner.fullName.trim
     '{ FullName.Machine(${Util.literal(qctx)(fullName)}) }
   }
 
   def sourceFileNameImpl(given qctx: QuoteContext): Expr[SourceFileName] = {
-    import qctx.tasty._
+    import qctx.tasty.{ _, given }
     val name = Option(rootContext.source) match {
       case Some(file) => file.getFileName.toString
       case _          => "<none>"
@@ -144,7 +145,7 @@ object Macros {
   }
 
   def sourceFilePathImpl(given qctx: QuoteContext): Expr[SourceFilePath] = {
-    import qctx.tasty._
+    import qctx.tasty.{ _, given }
     val path = Option(rootContext.source) match {
       case Some(file) => file.toString
       case _          => "<none>"
@@ -153,7 +154,7 @@ object Macros {
   }
 
   def lineImpl(given qctx: QuoteContext): Expr[Line] = {
-    import qctx.tasty._
+    import qctx.tasty.{ _, given }
     val line = rootPosition.startLine + 1
     '{ Line(${Util.literal(qctx)(line)}) }
   }
@@ -169,17 +170,18 @@ object Macros {
   }
 
   def pkgImpl(given qctx: QuoteContext): Expr[Pkg] = {
-    import qctx.tasty._
+    import qctx.tasty.{ _, given }
+    // https://github.com/lampepfl/dotty/blob/0.20.0-RC1/library/src/scala/tasty/reflect/SymbolOps.scala
     val path = enclosing(qctx)(_ match {
-      case IsPackageDefSymbol(_) => true
-      case _                     => false
+      case sym if sym.isPackageDef => true
+      case _                       => false
     })
     '{ Pkg(${Util.literal(qctx)(path)}) }
   }
 
   /*
   def argsImpl(given qctx: QuoteContext): Expr[Args] = {
-    import qctx.tasty._
+    import qctx.tasty.{ _, given }
     // import quoted._
 
     def nearestEnclosingMethod(owner: Symbol): Symbol =
@@ -215,7 +217,7 @@ object Macros {
   */
 
   def text[T: Type](v: Expr[T])(given qctx: QuoteContext): Expr[sourcecode.Text[T]] = {
-    import qctx.tasty._
+    import qctx.tasty.{ _, given }
     '{ Text($v, ${Util.literal(qctx)(rootPosition.sourceCode)}) }
   }
 
@@ -231,20 +233,20 @@ object Macros {
   }
 
   def enclosing(qctx: QuoteContext)(filter: qctx.tasty.Symbol => Boolean): String = {
-    import qctx.tasty._
+    import qctx.tasty.{ _, given }
     var current = rootContext.owner
     var path = List.empty[Chunk]
 
-    while(current != NoSymbol && current.toString != "package <root>" && current.toString != "module class <root>"){
+    while(current != Symbol.noSymbol && current.toString != "package <root>" && current.toString != "module class <root>"){
       if (filter(current)) {
-
+        // https://github.com/lampepfl/dotty/blob/0.20.0-RC1/library/src/scala/tasty/reflect/SymbolOps.scala
         val chunk: String => Chunk = current match {
-          case IsPackageDefSymbol(_) => Chunk.Pkg(_)
-          case IsClassDefSymbol(x) if x.flags.is(Flags.ModuleClass) => Chunk.Obj(_)
-          case IsClassDefSymbol(x) if x.flags.is(Flags.Trait) => Chunk.Trt(_)
-          case IsClassDefSymbol(_) => Chunk.Cls(_)
-          case IsDefDefSymbol(_) => Chunk.Def(_)
-          case IsValDefSymbol(_) => Chunk.Val(_)
+          case x if x.isPackageDef => Chunk.Pkg(_)
+          case x if x.isClassDef && x.flags.is(Flags.ModuleClass) => Chunk.Obj(_)
+          case x if x.isClassDef && x.flags.is(Flags.Trait) => Chunk.Trt(_)
+          case x if x.isClassDef => Chunk.Cls(_)
+          case x if x.isDefDef => Chunk.Def(_)
+          case x if x.isValDef => Chunk.Val(_)
         }
 
         path = chunk(Util.getName(qctx)(current)) :: path
