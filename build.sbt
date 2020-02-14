@@ -168,10 +168,10 @@ lazy val sharedSettings = Seq(
   ),
   // Version specific options
   scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, v)) if v >= 12 =>
-      scalaLinterOptions
+    case Some((2, v)) if v > 12 =>
+      scalaLinterOptions ++ Seq("-Wunused:-implicits", "-Xfatal-warnings")
     case Some((2, 12)) =>
-      scalaLinterOptions ++ scalaTwoTwelveDeprecatedOptions
+      scalaLinterOptions ++ scalaTwoTwelveDeprecatedOptions ++ Seq("-Ywarn-unused:-implicits", "-Xfatal-warnings")
     case Some((2, 11)) =>
       scalaLinterOptions ++ Seq("-target:jvm-1.8") ++ scalaTwoTwelveDeprecatedOptions
     case _ =>

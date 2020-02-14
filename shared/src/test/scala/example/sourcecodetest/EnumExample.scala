@@ -3,7 +3,7 @@ package example.sourcecodetest
 import verify.sourcecode.Name
 import verify._
 
-object EnumExaple extends BasicTestSuite {
+object EnumExample extends BasicTestSuite {
   case class EnumValue(name: String) {
     override def toString = name
   }
