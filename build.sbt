@@ -13,7 +13,7 @@
 import sbt._
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
-// shadow sbt-scalajs' crossProject and CrossType until Scala.js 1.0.0 is released
+// shadow sbt-scalajs' crossProject and CrossType until we drop Scala.js 0.6 from the crossbuild
 import sbtcrossproject.{ crossProject, CrossType }
 
 addCommandAlias("ci-all", ";+clean ;+test:compile ;+test ;+package")
@@ -82,7 +82,7 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
   )
   .jsSettings(
     libraryDependencies ++= Seq(
-      "org.portable-scala" %%% "portable-scala-reflect" % "0.1.1",
+      "org.portable-scala" %%% "portable-scala-reflect" % "1.0.0",
       "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
     ),
     scalaJSStage in Test := FastOptStage
