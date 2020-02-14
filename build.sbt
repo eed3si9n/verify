@@ -82,7 +82,7 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
   )
   .jsSettings(
     libraryDependencies ++= Seq(
-      "org.portable-scala" %%% "portable-scala-reflect" % "0.1.1",
+      "org.portable-scala" %%% "portable-scala-reflect" % "1.0.0",
       "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
     ),
     scalaJSStage in Test := FastOptStage
