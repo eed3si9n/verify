@@ -90,11 +90,11 @@ object Util{
     }
   }
   def literal(qctx: QuoteContext)(value: String): Expr[String] = {
-    import qctx.tasty._
+    import qctx.tasty.{ _, given _ }
     Literal(Constant(value)).seal.asInstanceOf[Expr[String]]
   }
   def literal(qctx: QuoteContext)(value: Int): Expr[Int] = {
-    import qctx.tasty._
+    import qctx.tasty.{ _, given _ }
     Literal(Constant(value)).seal.asInstanceOf[Expr[Int]]
   }
 }
