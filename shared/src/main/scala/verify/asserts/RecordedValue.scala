@@ -13,4 +13,6 @@
 package verify
 package asserts
 
-case class RecordedValue(value: Any, anchor: Int) {}
+case class RecordedValue[T: Show](value: T, anchor: Int) {
+  def showValue: String = Show[T].show(value)
+}
