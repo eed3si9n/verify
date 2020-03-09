@@ -78,7 +78,7 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
     libraryDependencies += "org.scala-sbt" % "test-interface" % "1.0"
   )
   .platformsSettings(NativePlatform)(
-    libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % Provided
+    libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.0.0" % Provided
   )
   .jsSettings(
     libraryDependencies ++= Seq(
