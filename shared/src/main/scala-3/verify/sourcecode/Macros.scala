@@ -73,10 +73,12 @@ abstract class ArgsMacros {
 */
 
 object Util{
+  def isMacro(qctx: QuoteContext)(s: qctx.tasty.Symbol): Boolean = isMacroName(getName(qctx)(s))
   def isSynthetic(qctx: QuoteContext)(s: qctx.tasty.Symbol): Boolean = isSyntheticName(getName(qctx)(s))
   def isSyntheticName(name: String) = {
-    name == "<init>" || (name.startsWith("<local ") && name.endsWith(">"))
+    name == "<init>" || (name.startsWith("<local ") && name.endsWith(">")) || isMacroName(name)
   }
+  def isMacroName(name: String) = name.startsWith("macro")
   def getName(qctx: QuoteContext)(s: qctx.tasty.Symbol): String = {
     import qctx.tasty.{ _, given }
     // https://github.com/lampepfl/dotty/blob/0.20.0-RC1/library/src/scala/tasty/reflect/SymbolOps.scala
@@ -104,7 +106,9 @@ object Macros {
   def nameImpl(given qctx: QuoteContext): Expr[Name] = {
     import qctx.tasty.{ _, given }
     var owner = rootContext.owner
-    while(Util.isSynthetic(qctx)(owner)) owner = owner.owner
+    while(Util.isSynthetic(qctx)(owner)) {
+      owner = owner.owner
+    }
     val simpleName = Util.cleanName(Util.getName(qctx)(owner))
     '{ Name(${Util.literal(qctx)(simpleName)}) }
   }
@@ -118,7 +122,10 @@ object Macros {
 
   def fullNameImpl(given qctx: QuoteContext): Expr[FullName] = {
     import qctx.tasty.{ _, given }
-    val owner = rootContext.owner
+    var owner = rootContext.owner
+    while(Util.isMacro(qctx)(owner)) {
+      owner = owner.owner
+    }
     val fullName =
       owner.fullName.trim
         .split("\\.", -1)
