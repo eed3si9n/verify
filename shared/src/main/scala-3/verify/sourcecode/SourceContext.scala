@@ -18,7 +18,7 @@ private[sourcecode] trait SourceValue[T]{
   def value: T
 }
 private[sourcecode] trait SourceCompanion[T, V <: SourceValue[T]](build: T => V){
-  def apply()(given V): T = summon[V].value
+  def apply()(using V): T = summon[V].value
 }
 
 case class Name(value: String) extends SourceValue[String]
@@ -48,7 +48,7 @@ object SourceLocation {
   implicit def toScalaVerifySourcecodeSourceLocation(implicit n: SourceFileName, p: SourceFilePath, l: Line): SourceLocation =
     SourceLocation(n.value, p.value, l.value)
 
-  def apply()(given SourceLocation): SourceLocation = summon[SourceLocation]
+  def apply()(using SourceLocation): SourceLocation = summon[SourceLocation]
 }
 
 case class Enclosing(value: String) extends SourceValue[String]
