@@ -15,9 +15,9 @@ package asserts
 
 import scala.quoted._
 
-class RecorderMacro(given qctx0: QuoteContext) {
+class RecorderMacro(using qctx0: QuoteContext) {
   // https://dotty.epfl.ch/docs/reference/metaprogramming/tasty-reflect.html#sealing-and-unsealing
-  import qctx0.tasty.{ Type => _, _, given }
+  import qctx0.tasty.{ Type => _, _ }
   import util._
 
   private[this] val runtimeSym: Symbol = '[RecorderRuntime[_, _]].unseal.tpe.typeSymbol
@@ -181,14 +181,14 @@ class RecorderMacro(given qctx0: QuoteContext) {
 object RecorderMacro {
   def apply[A: Type, R: Type](
       recording: Expr[A],
-      listener: Expr[RecorderListener[A, R]])(given qctx: QuoteContext): Expr[R] =
+      listener: Expr[RecorderListener[A, R]])(using qctx: QuoteContext): Expr[R] =
     new RecorderMacro().apply(recording, '{""}, listener)
 
   /** captures a method invocation in the shape of assert(expr, message). */
   def apply[A: Type, R: Type](
       recording: Expr[A],
       message: Expr[String],
-      listener: Expr[RecorderListener[A, R]])(given qctx: QuoteContext): Expr[R] =
+      listener: Expr[RecorderListener[A, R]])(using qctx: QuoteContext): Expr[R] =
     new RecorderMacro().apply(recording, message, listener)
 }
 
@@ -197,7 +197,7 @@ object StringRecorderMacro {
   def apply[R: Type](
       expected: Expr[String],
       found: Expr[String],
-      listener: Expr[RecorderListener[String, R]])(given qctx: QuoteContext): Expr[R] =
+      listener: Expr[RecorderListener[String, R]])(using qctx: QuoteContext): Expr[R] =
     new RecorderMacro().apply2[String, R](expected, found, '{""}, listener)
 
   /** captures a method invocation in the shape of assertEquals(expected, found). */
@@ -205,6 +205,6 @@ object StringRecorderMacro {
       expected: Expr[String],
       found: Expr[String],
       message: Expr[String],
-      listener: Expr[RecorderListener[String, R]])(given qctx: QuoteContext): Expr[R] =
+      listener: Expr[RecorderListener[String, R]])(using qctx: QuoteContext): Expr[R] =
     new RecorderMacro().apply2[String, R](expected, found, message, listener)
 }

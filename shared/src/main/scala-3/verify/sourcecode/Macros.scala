@@ -80,7 +80,7 @@ object Util{
   }
   def isMacroName(name: String) = name.startsWith("macro")
   def getName(qctx: QuoteContext)(s: qctx.tasty.Symbol): String = {
-    import qctx.tasty.{ _, given }
+    import qctx.tasty._
     // https://github.com/lampepfl/dotty/blob/0.20.0-RC1/library/src/scala/tasty/reflect/SymbolOps.scala
     s.name.trim
   }
@@ -92,19 +92,19 @@ object Util{
     }
   }
   def literal(qctx: QuoteContext)(value: String): Expr[String] = {
-    import qctx.tasty.{ _, given _ }
+    import qctx.tasty._
     Literal(Constant(value)).seal.asInstanceOf[Expr[String]]
   }
   def literal(qctx: QuoteContext)(value: Int): Expr[Int] = {
-    import qctx.tasty.{ _, given _ }
+    import qctx.tasty._
     Literal(Constant(value)).seal.asInstanceOf[Expr[Int]]
   }
 }
 
 object Macros {
 
-  def nameImpl(given qctx: QuoteContext): Expr[Name] = {
-    import qctx.tasty.{ _, given }
+  def nameImpl(using qctx: QuoteContext): Expr[Name] = {
+    import qctx.tasty._
     var owner = rootContext.owner
     while(Util.isSynthetic(qctx)(owner)) {
       owner = owner.owner
@@ -113,15 +113,15 @@ object Macros {
     '{ Name(${Util.literal(qctx)(simpleName)}) }
   }
 
-  def nameMachineImpl(given qctx: QuoteContext): Expr[Name.Machine] = {
-    import qctx.tasty.{ _, given }
+  def nameMachineImpl(using qctx: QuoteContext): Expr[Name.Machine] = {
+    import qctx.tasty._
     val owner = rootContext.owner
     val simpleName = Util.getName(qctx)(owner)
     '{ Name.Machine(${Util.literal(qctx)(simpleName)}) }
   }
 
-  def fullNameImpl(given qctx: QuoteContext): Expr[FullName] = {
-    import qctx.tasty.{ _, given }
+  def fullNameImpl(using qctx: QuoteContext): Expr[FullName] = {
+    import qctx.tasty._
     var owner = rootContext.owner
     while(Util.isMacro(qctx)(owner)) {
       owner = owner.owner
@@ -135,15 +135,15 @@ object Macros {
     '{ FullName(${Util.literal(qctx)(fullName)}) }
   }
 
-  def fullNameMachineImpl(given qctx: QuoteContext): Expr[FullName.Machine] = {
-    import qctx.tasty.{ _, given }
+  def fullNameMachineImpl(using qctx: QuoteContext): Expr[FullName.Machine] = {
+    import qctx.tasty._
     val owner = rootContext.owner
     val fullName = owner.fullName.trim
     '{ FullName.Machine(${Util.literal(qctx)(fullName)}) }
   }
 
-  def sourceFileNameImpl(given qctx: QuoteContext): Expr[SourceFileName] = {
-    import qctx.tasty.{ _, given }
+  def sourceFileNameImpl(using qctx: QuoteContext): Expr[SourceFileName] = {
+    import qctx.tasty._
     val name = Option(rootContext.source) match {
       case Some(file) => file.getFileName.toString
       case _          => "<none>"
@@ -151,8 +151,8 @@ object Macros {
     '{ SourceFileName(${Util.literal(qctx)(name)}) }
   }
 
-  def sourceFilePathImpl(given qctx: QuoteContext): Expr[SourceFilePath] = {
-    import qctx.tasty.{ _, given }
+  def sourceFilePathImpl(using qctx: QuoteContext): Expr[SourceFilePath] = {
+    import qctx.tasty._
     val path = Option(rootContext.source) match {
       case Some(file) => file.toString
       case _          => "<none>"
@@ -160,24 +160,24 @@ object Macros {
     '{ SourceFilePath(${Util.literal(qctx)(path)}) }
   }
 
-  def lineImpl(given qctx: QuoteContext): Expr[Line] = {
-    import qctx.tasty.{ _, given }
+  def lineImpl(using qctx: QuoteContext): Expr[Line] = {
+    import qctx.tasty._
     val line = rootPosition.startLine + 1
     '{ Line(${Util.literal(qctx)(line)}) }
   }
 
-  def enclosingImpl(given qctx: QuoteContext): Expr[Enclosing] = {
+  def enclosingImpl(using qctx: QuoteContext): Expr[Enclosing] = {
     val path = enclosing(qctx)(!Util.isSynthetic(qctx)(_))
     '{ Enclosing(${Util.literal(qctx)(path)}) }
   }
 
-  def enclosingMachineImpl(given qctx: QuoteContext): Expr[Enclosing.Machine] = {
+  def enclosingMachineImpl(using qctx: QuoteContext): Expr[Enclosing.Machine] = {
     val path = enclosing(qctx)(_ => true)
     '{ Enclosing.Machine(${Util.literal(qctx)(path)}) }
   }
 
-  def pkgImpl(given qctx: QuoteContext): Expr[Pkg] = {
-    import qctx.tasty.{ _, given }
+  def pkgImpl(using qctx: QuoteContext): Expr[Pkg] = {
+    import qctx.tasty._
     // https://github.com/lampepfl/dotty/blob/0.20.0-RC1/library/src/scala/tasty/reflect/SymbolOps.scala
     val path = enclosing(qctx)(_ match {
       case sym if sym.isPackageDef => true
@@ -187,8 +187,8 @@ object Macros {
   }
 
   /*
-  def argsImpl(given qctx: QuoteContext): Expr[Args] = {
-    import qctx.tasty.{ _, given }
+  def argsImpl(using qctx: QuoteContext): Expr[Args] = {
+    import qctx.tasty._
     // import quoted._
 
     def nearestEnclosingMethod(owner: Symbol): Symbol =
@@ -223,8 +223,8 @@ object Macros {
   }
   */
 
-  def text[T: Type](v: Expr[T])(given qctx: QuoteContext): Expr[sourcecode.Text[T]] = {
-    import qctx.tasty.{ _, given }
+  def text[T: Type](v: Expr[T])(using qctx: QuoteContext): Expr[sourcecode.Text[T]] = {
+    import qctx.tasty._
     '{ Text($v, ${Util.literal(qctx)(rootPosition.sourceCode)}) }
   }
 
@@ -240,7 +240,7 @@ object Macros {
   }
 
   def enclosing(qctx: QuoteContext)(filter: qctx.tasty.Symbol => Boolean): String = {
-    import qctx.tasty.{ _, given }
+    import qctx.tasty._
     var current = rootContext.owner
     var path = List.empty[Chunk]
 
