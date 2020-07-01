@@ -41,10 +41,10 @@ install:
 
 script:
   - sbt ++2.11.12!    verifyJVM/test
-  - sbt ++2.12.10!    verifyJVM/test
-  - sbt ++2.13.1!     verifyJVM/test
-  - sbt ++0.23.0-RC1! verifyJVM/test
-  - env SCALAJS_VERSION=0.6.32 sbt +verifyJS/test
+  - sbt ++2.12.11!    verifyJVM/test
+  - sbt ++2.13.3!     verifyJVM/test
+  - sbt ++0.25.0-RC2! verifyJVM/test
+  - env SCALAJS_VERSION=0.6.33 sbt +verifyJS/test
   - env SCALAJS_VERSION=1.1.0  sbt +verifyJS/test
 
 before_cache:
