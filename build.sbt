@@ -20,9 +20,9 @@ addCommandAlias("ci-all", ";+clean ;+test:compile ;+test ;+package")
 addCommandAlias("release", ";+clean ;+verifyNative/clean ;+publishSigned ;+verifyNative/publishSigned")
 
 val Scala211 = "2.11.12"
-val Scala212 = "2.12.10"
-val Scala213 = "2.13.1"
-val Scala3 = "0.23.0-RC1"
+val Scala212 = "2.12.11"
+val Scala213 = "2.13.3"
+val Scala3 = "0.25.0-RC2"
 
 ThisBuild / scalaVersion := Scala212
 ThisBuild / crossScalaVersions := Seq(Scala211, Scala212, Scala213)
