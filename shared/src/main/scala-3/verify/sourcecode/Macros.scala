@@ -105,7 +105,7 @@ object Macros {
 
   def nameImpl(using qctx: QuoteContext): Expr[Name] = {
     import qctx.tasty._
-    var owner = rootContext.owner
+    var owner = Symbol.currentOwner(using rootContext)
     while(Util.isSynthetic(qctx)(owner)) {
       owner = owner.owner
     }
@@ -115,14 +115,14 @@ object Macros {
 
   def nameMachineImpl(using qctx: QuoteContext): Expr[Name.Machine] = {
     import qctx.tasty._
-    val owner = rootContext.owner
+    var owner = Symbol.currentOwner(using rootContext)
     val simpleName = Util.getName(qctx)(owner)
     '{ Name.Machine(${Util.literal(qctx)(simpleName)}) }
   }
 
   def fullNameImpl(using qctx: QuoteContext): Expr[FullName] = {
     import qctx.tasty._
-    var owner = rootContext.owner
+    var owner = Symbol.currentOwner(using rootContext)
     while(Util.isMacro(qctx)(owner)) {
       owner = owner.owner
     }
@@ -137,26 +137,21 @@ object Macros {
 
   def fullNameMachineImpl(using qctx: QuoteContext): Expr[FullName.Machine] = {
     import qctx.tasty._
-    val owner = rootContext.owner
+    var owner = Symbol.currentOwner(using rootContext)
     val fullName = owner.fullName.trim
     '{ FullName.Machine(${Util.literal(qctx)(fullName)}) }
   }
 
   def sourceFileNameImpl(using qctx: QuoteContext): Expr[SourceFileName] = {
     import qctx.tasty._
-    val name = Option(rootContext.source) match {
-      case Some(file) => file.getFileName.toString
-      case _          => "<none>"
-    }
+
+    val name = Source.path.getFileName.toString
     '{ SourceFileName(${Util.literal(qctx)(name)}) }
   }
 
   def sourceFilePathImpl(using qctx: QuoteContext): Expr[SourceFilePath] = {
     import qctx.tasty._
-    val path = Option(rootContext.source) match {
-      case Some(file) => file.toString
-      case _          => "<none>"
-    }
+    val path = Source.path.toString
     '{ SourceFilePath(${Util.literal(qctx)(path)}) }
   }
 
@@ -241,7 +236,7 @@ object Macros {
 
   def enclosing(qctx: QuoteContext)(filter: qctx.tasty.Symbol => Boolean): String = {
     import qctx.tasty._
-    var current = rootContext.owner
+    var current = Symbol.currentOwner(using rootContext)
     var path = List.empty[Chunk]
 
     while(current != Symbol.noSymbol && current.toString != "package <root>" && current.toString != "module class <root>"){
