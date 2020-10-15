@@ -45,7 +45,7 @@ script:
   - sbt ++2.13.3!     verifyJVM/test
   - sbt ++0.27.0-RC1! verifyJVM/test
   - env SCALAJS_VERSION=0.6.33 sbt +verifyJS/test
-  - env SCALAJS_VERSION=1.1.1  sbt +verifyJS/test
+  - env SCALAJS_VERSION=1.3.0  sbt +verifyJS/test
 
 before_cache:
   - du -h -d 1 $HOME/.ivy2/cache
