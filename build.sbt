@@ -22,7 +22,7 @@ addCommandAlias("release", ";+clean ;+verifyNative/clean ;+publishSigned ;+verif
 val Scala211 = "2.11.12"
 val Scala212 = "2.12.11"
 val Scala213 = "2.13.3"
-val Scala3 = "0.25.0-RC2"
+val Scala3 = "0.27.0-RC1"
 
 ThisBuild / scalaVersion := Scala212
 ThisBuild / crossScalaVersions := Seq(Scala211, Scala212, Scala213)
@@ -229,6 +229,4 @@ ThisBuild / isSnapshot := {
   (ThisBuild / version).value endsWith "SNAPSHOT"
 }
 ThisBuild / Test / publishArtifact := false
-ThisBuild / pomIncludeRepository := { _ =>
-  false
-} // removes optional dependencies
+ThisBuild / pomIncludeRepository := { _ => false } // removes optional dependencies
