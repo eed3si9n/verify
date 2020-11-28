@@ -17,7 +17,7 @@ import scala.quoted._
 
 class RecorderMacro(using qctx0: QuoteContext) {
   // https://dotty.epfl.ch/docs/reference/metaprogramming/tasty-reflect.html#sealing-and-unsealing
-  import qctx0.tasty.{ Type => _, _ }
+  import qctx0.reflect._
   import util._
 
   private[this] val runtimeSym: Symbol = '[RecorderRuntime[_, _]].unseal.tpe.typeSymbol
@@ -89,8 +89,8 @@ class RecorderMacro(using qctx0: QuoteContext) {
     }
     Apply(recordExpressionSel,
       List(
-        Literal(Constant(source)),
-        Literal(Constant(ast)),
+        Literal(Constant.String(source)),
+        Literal(Constant.String(ast)),
         instrumented
       ))
   }
@@ -99,7 +99,7 @@ class RecorderMacro(using qctx0: QuoteContext) {
     expr match {
       case New(_)     => expr
       case Literal(_) => expr
-      case Typed(r @ Repeated(xs, y), tpe) => recordSubValues(runtime, r)
+      case Typed(r @ Repeated(xs, y), tpe) => Typed.copy(r)(recordSubValues(runtime, r), tpe)
       // don't record value of implicit "this" added by compiler; couldn't find a better way to detect implicit "this" than via point
       case Select(x@This(_), y) if expr.pos.start == x.pos.start => expr
       // case x: Select if x.symbol.isModule => expr // don't try to record the value of packages
@@ -155,7 +155,7 @@ class RecorderMacro(using qctx0: QuoteContext) {
           tapply,
           List(
             expr,
-            Literal(Constant(getAnchor(expr)))
+            Literal(Constant.Int(getAnchor(expr)))
           )
         )
     }
