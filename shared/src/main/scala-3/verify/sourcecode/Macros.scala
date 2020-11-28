@@ -72,13 +72,13 @@ abstract class ArgsMacros {
 */
 
 object Util{
-  def isMacro(qctx: QuoteContext)(s: qctx.reflect.Symbol): Boolean = isMacroName(getName(qctx)(s))
-  def isSynthetic(qctx: QuoteContext)(s: qctx.reflect.Symbol): Boolean = isSyntheticName(getName(qctx)(s))
+  def isMacro(qctx: Quotes)(s: qctx.reflect.Symbol): Boolean = isMacroName(getName(qctx)(s))
+  def isSynthetic(qctx: Quotes)(s: qctx.reflect.Symbol): Boolean = isSyntheticName(getName(qctx)(s))
   def isSyntheticName(name: String) = {
     name == "<init>" || (name.startsWith("<local ") && name.endsWith(">")) || isMacroName(name)
   }
   def isMacroName(name: String) = name.startsWith("macro")
-  def getName(qctx: QuoteContext)(s: qctx.reflect.Symbol): String = {
+  def getName(qctx: Quotes)(s: qctx.reflect.Symbol): String = {
     import qctx.reflect._
     // https://github.com/lampepfl/dotty/blob/0.20.0-RC1/library/src/scala/tasty/reflect/SymbolOps.scala
     s.name.trim
@@ -90,21 +90,21 @@ object Util{
       case _ => name0
     }
   }
-  def literal(qctx: QuoteContext)(value: String): Expr[String] = {
+  def literal(qctx: Quotes)(value: String): Expr[String] = {
     import qctx.reflect._
-    Literal(Constant.String(value)).seal.asInstanceOf[Expr[String]]
+    Literal(Constant.String(value)).asExpr.asInstanceOf[Expr[String]]
   }
-  def literal(qctx: QuoteContext)(value: Int): Expr[Int] = {
+  def literal(qctx: Quotes)(value: Int): Expr[Int] = {
     import qctx.reflect._
-    Literal(Constant.Int(value)).seal.asInstanceOf[Expr[Int]]
+    Literal(Constant.Int(value)).asExpr.asInstanceOf[Expr[Int]]
   }
 }
 
 object Macros {
 
-  def nameImpl(using qctx: QuoteContext): Expr[Name] = {
+  def nameImpl(using qctx: Quotes): Expr[Name] = {
     import qctx.reflect._
-    var owner = Symbol.currentOwner(using rootContext)
+    var owner = Symbol.spliceOwner
     while(Util.isSynthetic(qctx)(owner)) {
       owner = owner.owner
     }
@@ -112,16 +112,16 @@ object Macros {
     '{ Name(${Util.literal(qctx)(simpleName)}) }
   }
 
-  def nameMachineImpl(using qctx: QuoteContext): Expr[Name.Machine] = {
+  def nameMachineImpl(using qctx: Quotes): Expr[Name.Machine] = {
     import qctx.reflect._
-    var owner = Symbol.currentOwner(using rootContext)
+    var owner = Symbol.spliceOwner
     val simpleName = Util.getName(qctx)(owner)
     '{ Name.Machine(${Util.literal(qctx)(simpleName)}) }
   }
 
-  def fullNameImpl(using qctx: QuoteContext): Expr[FullName] = {
+  def fullNameImpl(using qctx: Quotes): Expr[FullName] = {
     import qctx.reflect._
-    var owner = Symbol.currentOwner(using rootContext)
+    var owner = Symbol.spliceOwner
     while(Util.isMacro(qctx)(owner)) {
       owner = owner.owner
     }
@@ -134,43 +134,43 @@ object Macros {
     '{ FullName(${Util.literal(qctx)(fullName)}) }
   }
 
-  def fullNameMachineImpl(using qctx: QuoteContext): Expr[FullName.Machine] = {
+  def fullNameMachineImpl(using qctx: Quotes): Expr[FullName.Machine] = {
     import qctx.reflect._
-    var owner = Symbol.currentOwner(using rootContext)
+    var owner = Symbol.spliceOwner
     val fullName = owner.fullName.trim
     '{ FullName.Machine(${Util.literal(qctx)(fullName)}) }
   }
 
-  def sourceFileNameImpl(using qctx: QuoteContext): Expr[SourceFileName] = {
+  def sourceFileNameImpl(using qctx: Quotes): Expr[SourceFileName] = {
     import qctx.reflect._
 
     val name = Source.path.getFileName.toString
     '{ SourceFileName(${Util.literal(qctx)(name)}) }
   }
 
-  def sourceFilePathImpl(using qctx: QuoteContext): Expr[SourceFilePath] = {
+  def sourceFilePathImpl(using qctx: Quotes): Expr[SourceFilePath] = {
     import qctx.reflect._
     val path = Source.path.toString
     '{ SourceFilePath(${Util.literal(qctx)(path)}) }
   }
 
-  def lineImpl(using qctx: QuoteContext): Expr[Line] = {
+  def lineImpl(using qctx: Quotes): Expr[Line] = {
     import qctx.reflect._
-    val line = rootPosition.startLine + 1
+    val line = Position.ofMacroExpansion.startLine + 1
     '{ Line(${Util.literal(qctx)(line)}) }
   }
 
-  def enclosingImpl(using qctx: QuoteContext): Expr[Enclosing] = {
+  def enclosingImpl(using qctx: Quotes): Expr[Enclosing] = {
     val path = enclosing(qctx)(!Util.isSynthetic(qctx)(_))
     '{ Enclosing(${Util.literal(qctx)(path)}) }
   }
 
-  def enclosingMachineImpl(using qctx: QuoteContext): Expr[Enclosing.Machine] = {
+  def enclosingMachineImpl(using qctx: Quotes): Expr[Enclosing.Machine] = {
     val path = enclosing(qctx)(_ => true)
     '{ Enclosing.Machine(${Util.literal(qctx)(path)}) }
   }
 
-  def pkgImpl(using qctx: QuoteContext): Expr[Pkg] = {
+  def pkgImpl(using qctx: Quotes): Expr[Pkg] = {
     import qctx.reflect._
     // https://github.com/lampepfl/dotty/blob/0.20.0-RC1/library/src/scala/tasty/reflect/SymbolOps.scala
     val path = enclosing(qctx)(_ match {
@@ -181,7 +181,7 @@ object Macros {
   }
 
   /*
-  def argsImpl(using qctx: QuoteContext): Expr[Args] = {
+  def argsImpl(using qctx: Quotes): Expr[Args] = {
     import qctx.reflect._
     // import quoted._
 
@@ -217,9 +217,9 @@ object Macros {
   }
   */
 
-  def text[T: Type](v: Expr[T])(using qctx: QuoteContext): Expr[sourcecode.Text[T]] = {
+  def text[T: Type](v: Expr[T])(using qctx: Quotes): Expr[sourcecode.Text[T]] = {
     import qctx.reflect._
-    '{ Text($v, ${Util.literal(qctx)(rootPosition.sourceCode)}) }
+    '{ Text($v, ${Util.literal(qctx)(Position.ofMacroExpansion.sourceCode)}) }
   }
 
   enum Chunk {
@@ -233,9 +233,9 @@ object Macros {
     case Def(name: String)
   }
 
-  def enclosing(qctx: QuoteContext)(filter: qctx.reflect.Symbol => Boolean): String = {
+  def enclosing(qctx: Quotes)(filter: qctx.reflect.Symbol => Boolean): String = {
     import qctx.reflect._
-    var current = Symbol.currentOwner(using rootContext)
+    var current = Symbol.spliceOwner
     var path = List.empty[Chunk]
 
     while(current != Symbol.noSymbol && current.toString != "package <root>" && current.toString != "module class <root>"){
