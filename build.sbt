@@ -25,7 +25,6 @@ val Scala213 = "2.13.3"
 val Scala3 = "0.27.0-RC1"
 
 ThisBuild / scalaVersion := Scala212
-ThisBuild / crossScalaVersions := Seq(Scala211, Scala212, Scala213)
 
 ThisBuild / organization := "com.eed3si9n.verify"
 ThisBuild / homepage := Some(url("https://www.scala-lang.org"))
@@ -53,7 +52,8 @@ lazy val verifyRoot = (project in file("."))
   .settings(
     name := "verify root",
     Compile / sources := Nil,
-    publish / skip := true
+    publish / skip := true,
+    crossScalaVersions := Nil,
   )
 
 lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file("."))
@@ -74,13 +74,14 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
     }
   )
   .jvmSettings(
-    crossScalaVersions += Scala3,
+    crossScalaVersions := Seq(Scala211, Scala212, Scala213, Scala3),
     libraryDependencies += "org.scala-sbt" % "test-interface" % "1.0"
   )
   .platformsSettings(NativePlatform)(
     libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.0.0" % Provided
   )
   .jsSettings(
+    crossScalaVersions := Seq(Scala211, Scala212, Scala213),
     libraryDependencies ++= Seq(
       "org.portable-scala" %%% "portable-scala-reflect" % "1.0.0",
       "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
