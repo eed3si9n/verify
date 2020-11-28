@@ -15,7 +15,6 @@ package sourcecode
 
 import language.experimental.macros
 import scala.quoted._
-import scala.tasty._
 
 abstract class NameMacros {
   inline given Name = ${Macros.nameImpl}
@@ -73,14 +72,14 @@ abstract class ArgsMacros {
 */
 
 object Util{
-  def isMacro(qctx: QuoteContext)(s: qctx.tasty.Symbol): Boolean = isMacroName(getName(qctx)(s))
-  def isSynthetic(qctx: QuoteContext)(s: qctx.tasty.Symbol): Boolean = isSyntheticName(getName(qctx)(s))
+  def isMacro(qctx: QuoteContext)(s: qctx.reflect.Symbol): Boolean = isMacroName(getName(qctx)(s))
+  def isSynthetic(qctx: QuoteContext)(s: qctx.reflect.Symbol): Boolean = isSyntheticName(getName(qctx)(s))
   def isSyntheticName(name: String) = {
     name == "<init>" || (name.startsWith("<local ") && name.endsWith(">")) || isMacroName(name)
   }
   def isMacroName(name: String) = name.startsWith("macro")
-  def getName(qctx: QuoteContext)(s: qctx.tasty.Symbol): String = {
-    import qctx.tasty._
+  def getName(qctx: QuoteContext)(s: qctx.reflect.Symbol): String = {
+    import qctx.reflect._
     // https://github.com/lampepfl/dotty/blob/0.20.0-RC1/library/src/scala/tasty/reflect/SymbolOps.scala
     s.name.trim
   }
@@ -92,19 +91,19 @@ object Util{
     }
   }
   def literal(qctx: QuoteContext)(value: String): Expr[String] = {
-    import qctx.tasty._
-    Literal(Constant(value)).seal.asInstanceOf[Expr[String]]
+    import qctx.reflect._
+    Literal(Constant.String(value)).seal.asInstanceOf[Expr[String]]
   }
   def literal(qctx: QuoteContext)(value: Int): Expr[Int] = {
-    import qctx.tasty._
-    Literal(Constant(value)).seal.asInstanceOf[Expr[Int]]
+    import qctx.reflect._
+    Literal(Constant.Int(value)).seal.asInstanceOf[Expr[Int]]
   }
 }
 
 object Macros {
 
   def nameImpl(using qctx: QuoteContext): Expr[Name] = {
-    import qctx.tasty._
+    import qctx.reflect._
     var owner = Symbol.currentOwner(using rootContext)
     while(Util.isSynthetic(qctx)(owner)) {
       owner = owner.owner
@@ -114,14 +113,14 @@ object Macros {
   }
 
   def nameMachineImpl(using qctx: QuoteContext): Expr[Name.Machine] = {
-    import qctx.tasty._
+    import qctx.reflect._
     var owner = Symbol.currentOwner(using rootContext)
     val simpleName = Util.getName(qctx)(owner)
     '{ Name.Machine(${Util.literal(qctx)(simpleName)}) }
   }
 
   def fullNameImpl(using qctx: QuoteContext): Expr[FullName] = {
-    import qctx.tasty._
+    import qctx.reflect._
     var owner = Symbol.currentOwner(using rootContext)
     while(Util.isMacro(qctx)(owner)) {
       owner = owner.owner
@@ -136,27 +135,27 @@ object Macros {
   }
 
   def fullNameMachineImpl(using qctx: QuoteContext): Expr[FullName.Machine] = {
-    import qctx.tasty._
+    import qctx.reflect._
     var owner = Symbol.currentOwner(using rootContext)
     val fullName = owner.fullName.trim
     '{ FullName.Machine(${Util.literal(qctx)(fullName)}) }
   }
 
   def sourceFileNameImpl(using qctx: QuoteContext): Expr[SourceFileName] = {
-    import qctx.tasty._
+    import qctx.reflect._
 
     val name = Source.path.getFileName.toString
     '{ SourceFileName(${Util.literal(qctx)(name)}) }
   }
 
   def sourceFilePathImpl(using qctx: QuoteContext): Expr[SourceFilePath] = {
-    import qctx.tasty._
+    import qctx.reflect._
     val path = Source.path.toString
     '{ SourceFilePath(${Util.literal(qctx)(path)}) }
   }
 
   def lineImpl(using qctx: QuoteContext): Expr[Line] = {
-    import qctx.tasty._
+    import qctx.reflect._
     val line = rootPosition.startLine + 1
     '{ Line(${Util.literal(qctx)(line)}) }
   }
@@ -172,7 +171,7 @@ object Macros {
   }
 
   def pkgImpl(using qctx: QuoteContext): Expr[Pkg] = {
-    import qctx.tasty._
+    import qctx.reflect._
     // https://github.com/lampepfl/dotty/blob/0.20.0-RC1/library/src/scala/tasty/reflect/SymbolOps.scala
     val path = enclosing(qctx)(_ match {
       case sym if sym.isPackageDef => true
@@ -183,7 +182,7 @@ object Macros {
 
   /*
   def argsImpl(using qctx: QuoteContext): Expr[Args] = {
-    import qctx.tasty._
+    import qctx.reflect._
     // import quoted._
 
     def nearestEnclosingMethod(owner: Symbol): Symbol =
@@ -219,7 +218,7 @@ object Macros {
   */
 
   def text[T: Type](v: Expr[T])(using qctx: QuoteContext): Expr[sourcecode.Text[T]] = {
-    import qctx.tasty._
+    import qctx.reflect._
     '{ Text($v, ${Util.literal(qctx)(rootPosition.sourceCode)}) }
   }
 
@@ -234,8 +233,8 @@ object Macros {
     case Def(name: String)
   }
 
-  def enclosing(qctx: QuoteContext)(filter: qctx.tasty.Symbol => Boolean): String = {
-    import qctx.tasty._
+  def enclosing(qctx: QuoteContext)(filter: qctx.reflect.Symbol => Boolean): String = {
+    import qctx.reflect._
     var current = Symbol.currentOwner(using rootContext)
     var path = List.empty[Chunk]
 
