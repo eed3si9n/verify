@@ -243,7 +243,7 @@ object Macros {
         // https://github.com/lampepfl/dotty/blob/0.20.0-RC1/library/src/scala/tasty/reflect/SymbolOps.scala
         val chunk: String => Chunk = current match {
           case x if x.isPackageDef => Chunk.Pkg(_)
-          case x if x.isClassDef && x.flags.is(Flags.ModuleClass) => Chunk.Obj(_)
+          case x if x.isClassDef && x.flags.is(Flags.Module) => Chunk.Obj(_)
           case x if x.isClassDef && x.flags.is(Flags.Trait) => Chunk.Trt(_)
           case x if x.isClassDef => Chunk.Cls(_)
           case x if x.isDefDef => Chunk.Def(_)
