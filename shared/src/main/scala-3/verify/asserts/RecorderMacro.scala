@@ -164,7 +164,7 @@ class RecorderMacro(using qctx0: Quotes) {
 
   private[this] def getSourceCode(expr: Tree): String = {
     val pos = expr.pos
-    (" " * pos.startColumn) + pos.sourceCode
+    (" " * pos.startColumn) + pos.sourceCode.get
   }
 
   private[this] def getAnchor(expr: Term): Int =
@@ -174,7 +174,7 @@ class RecorderMacro(using qctx0: Quotes) {
       case Apply(x, ys)     => getAnchor(x) + 0
       case TypeApply(x, ys) => getAnchor(x) + 0
       case Select(x, y)     =>
-        expr.pos.startColumn + math.max(0, expr.pos.sourceCode.indexOf(y))
+        expr.pos.startColumn + math.max(0, expr.pos.sourceCode.get.indexOf(y))
       case _                => expr.pos.startColumn
     }
 }

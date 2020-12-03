@@ -144,13 +144,13 @@ object Macros {
   def sourceFileNameImpl(using qctx: Quotes): Expr[SourceFileName] = {
     import qctx.reflect._
 
-    val name = Source.path.getFileName.toString
+    val name = SourceFile.current.jpath.getFileName.toString
     '{ SourceFileName(${Util.literal(qctx)(name)}) }
   }
 
   def sourceFilePathImpl(using qctx: Quotes): Expr[SourceFilePath] = {
     import qctx.reflect._
-    val path = Source.path.toString
+    val path = SourceFile.current.jpath.toString
     '{ SourceFilePath(${Util.literal(qctx)(path)}) }
   }
 
@@ -219,7 +219,7 @@ object Macros {
 
   def text[T: Type](v: Expr[T])(using qctx: Quotes): Expr[sourcecode.Text[T]] = {
     import qctx.reflect._
-    '{ Text($v, ${Util.literal(qctx)(Position.ofMacroExpansion.sourceCode)}) }
+    '{ Text($v, ${Util.literal(qctx)(Position.ofMacroExpansion.sourceCode.get)}) }
   }
 
   enum Chunk {
