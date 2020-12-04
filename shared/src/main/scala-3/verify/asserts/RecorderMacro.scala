@@ -67,7 +67,7 @@ class RecorderMacro(using qctx0: Quotes) {
     val ast = recording.showExtractors
 
     val resetValuesSel: Term = {
-      val m = runtimeSym.method("resetValues").head
+      val m = runtimeSym.memberMethod("resetValues").head
       runtime.select(m)
     }
     try {
@@ -85,7 +85,7 @@ class RecorderMacro(using qctx0: Quotes) {
   private[this] def recordExpression(runtime: Term, source: String, ast: String, expr: Term): Term = {
     val instrumented = recordAllValues(runtime, expr)
     val recordExpressionSel: Term = {
-      val m = runtimeSym.method("recordExpression").head
+      val m = runtimeSym.memberMethod("recordExpression").head
       runtime.select(m)
     }
     Apply(recordExpressionSel,
@@ -127,7 +127,7 @@ class RecorderMacro(using qctx0: Quotes) {
     // debug
     // println("recording " + expr.showExtractors + " at " + getAnchor(expr))
     val recordValueSel: Term = {
-      val m = runtimeSym.method("recordValue").head
+      val m = runtimeSym.memberMethod("recordValue").head
       runtime.select(m)
     }
     def skipIdent(sym: Symbol): Boolean =
