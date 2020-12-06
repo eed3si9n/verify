@@ -64,7 +64,7 @@ class RecorderMacro(using qctx0: Quotes) {
 
   private[this] def recordExpressions(runtime: Term, recording: Term): List[Term] = {
     val source = getSourceCode(recording)
-    val ast = recording.showExtractors
+    val ast = recording.show(using Printer.TreeStructure)
 
     val resetValuesSel: Term = {
       val m = runtimeSym.memberMethod("resetValues").head
