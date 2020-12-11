@@ -90,8 +90,8 @@ class RecorderMacro(using qctx0: Quotes) {
     }
     Apply(recordExpressionSel,
       List(
-        Literal(Constant.String(source)),
-        Literal(Constant.String(ast)),
+        Literal(StringConstant(source)),
+        Literal(StringConstant(ast)),
         instrumented
       ))
   }
@@ -156,7 +156,7 @@ class RecorderMacro(using qctx0: Quotes) {
           tapply,
           List(
             expr,
-            Literal(Constant.Int(getAnchor(expr)))
+            Literal(IntConstant(getAnchor(expr)))
           )
         )
     }

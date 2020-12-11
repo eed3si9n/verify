@@ -92,11 +92,11 @@ object Util{
   }
   def literal(qctx: Quotes)(value: String): Expr[String] = {
     import qctx.reflect._
-    Literal(Constant.String(value)).asExpr.asInstanceOf[Expr[String]]
+    Literal(StringConstant(value)).asExpr.asInstanceOf[Expr[String]]
   }
   def literal(qctx: Quotes)(value: Int): Expr[Int] = {
     import qctx.reflect._
-    Literal(Constant.Int(value)).asExpr.asInstanceOf[Expr[Int]]
+    Literal(IntConstant(value)).asExpr.asInstanceOf[Expr[Int]]
   }
 }
 
