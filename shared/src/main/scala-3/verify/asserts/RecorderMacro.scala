@@ -27,15 +27,15 @@ class RecorderMacro(using qctx0: Quotes) {
       recording: Expr[A],
       message: Expr[String],
       listener: Expr[RecorderListener[A, R]]): Expr[R] = {
-    val termArg: Term = Term.of(recording).underlyingArgument
+    val termArg: Term = recording.asTerm.underlyingArgument
 
     '{
       val recorderRuntime: RecorderRuntime[A, R] = new RecorderRuntime($listener)
       recorderRuntime.recordMessage($message)
       ${
         Block(
-          recordExpressions(Term.of('{ recorderRuntime }), termArg),
-          Term.of('{ recorderRuntime.completeRecording() })
+          recordExpressions('{ recorderRuntime }.asTerm, termArg),
+          '{ recorderRuntime.completeRecording() }.asTerm
         ).asExprOf[R]
       }
     }
@@ -46,17 +46,17 @@ class RecorderMacro(using qctx0: Quotes) {
       found: Expr[A],
       message: Expr[String],
       listener: Expr[RecorderListener[A, R]]): Expr[R] = {
-    val expectedArg: Term = Term.of(expected).underlyingArgument
-    val foundArg: Term = Term.of(found).underlyingArgument
+    val expectedArg: Term = expected.asTerm.underlyingArgument
+    val foundArg: Term = found.asTerm.underlyingArgument
 
     '{
       val recorderRuntime: RecorderRuntime[A, R] = new RecorderRuntime($listener)
       recorderRuntime.recordMessage($message)
       ${
         Block(
-          recordExpressions(Term.of('{ recorderRuntime }), expectedArg) :::
-          recordExpressions(Term.of('{ recorderRuntime }), foundArg),
-          Term.of('{ recorderRuntime.completeRecording() })
+          recordExpressions('{ recorderRuntime }.asTerm, expectedArg) :::
+          recordExpressions('{ recorderRuntime }.asTerm, foundArg),
+          '{ recorderRuntime.completeRecording() }.asTerm
         ).asExprOf[R]
       }
     }
