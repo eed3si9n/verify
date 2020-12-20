@@ -81,11 +81,21 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
     libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.0.0" % Provided
   )
   .jsSettings(
-    crossScalaVersions := Seq(Scala211, Scala212, Scala213),
-    libraryDependencies ++= Seq(
-      "org.portable-scala" %%% "portable-scala-reflect" % "1.0.0",
-      "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
-    ),
+    crossScalaVersions := Seq(Scala211, Scala212, Scala213, Scala3),
+    libraryDependencies ++= {
+      val sv = scalaBinaryVersion.value
+      if (sv.startsWith("3."))
+        // https://github.com/portable-scala/portable-scala-reflect/issues/23
+        Seq(
+          "org.portable-scala" % "portable-scala-reflect_sjs1_2.13" % "1.0.0",
+          "org.scala-js" % "scalajs-test-interface_2.13" % scalaJSVersion
+        )
+      else
+        Seq(
+          "org.portable-scala" %%% "portable-scala-reflect" % "1.0.0",
+          "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
+        )
+    },
     scalaJSStage in Test := FastOptStage
   )
   .nativeSettings(
