@@ -92,11 +92,11 @@ object Util{
   }
   def literal(qctx: Quotes)(value: String): Expr[String] = {
     import qctx.reflect._
-    Literal(Constant.String(value)).asExpr.asInstanceOf[Expr[String]]
+    Literal(StringConstant(value)).asExpr.asInstanceOf[Expr[String]]
   }
   def literal(qctx: Quotes)(value: Int): Expr[Int] = {
     import qctx.reflect._
-    Literal(Constant.Int(value)).asExpr.asInstanceOf[Expr[Int]]
+    Literal(IntConstant(value)).asExpr.asInstanceOf[Expr[Int]]
   }
 }
 
@@ -144,13 +144,13 @@ object Macros {
   def sourceFileNameImpl(using qctx: Quotes): Expr[SourceFileName] = {
     import qctx.reflect._
 
-    val name = Source.path.getFileName.toString
+    val name = SourceFile.current.jpath.getFileName.toString
     '{ SourceFileName(${Util.literal(qctx)(name)}) }
   }
 
   def sourceFilePathImpl(using qctx: Quotes): Expr[SourceFilePath] = {
     import qctx.reflect._
-    val path = Source.path.toString
+    val path = SourceFile.current.jpath.toString
     '{ SourceFilePath(${Util.literal(qctx)(path)}) }
   }
 
@@ -219,7 +219,7 @@ object Macros {
 
   def text[T: Type](v: Expr[T])(using qctx: Quotes): Expr[sourcecode.Text[T]] = {
     import qctx.reflect._
-    '{ Text($v, ${Util.literal(qctx)(Position.ofMacroExpansion.sourceCode)}) }
+    '{ Text($v, ${Util.literal(qctx)(Position.ofMacroExpansion.sourceCode.get)}) }
   }
 
   enum Chunk {
@@ -243,7 +243,7 @@ object Macros {
         // https://github.com/lampepfl/dotty/blob/0.20.0-RC1/library/src/scala/tasty/reflect/SymbolOps.scala
         val chunk: String => Chunk = current match {
           case x if x.isPackageDef => Chunk.Pkg(_)
-          case x if x.isClassDef && x.flags.is(Flags.ModuleClass) => Chunk.Obj(_)
+          case x if x.isClassDef && x.flags.is(Flags.Module) => Chunk.Obj(_)
           case x if x.isClassDef && x.flags.is(Flags.Trait) => Chunk.Trt(_)
           case x if x.isClassDef => Chunk.Cls(_)
           case x if x.isDefDef => Chunk.Def(_)

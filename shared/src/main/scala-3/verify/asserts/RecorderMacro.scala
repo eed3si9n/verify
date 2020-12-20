@@ -27,15 +27,15 @@ class RecorderMacro(using qctx0: Quotes) {
       recording: Expr[A],
       message: Expr[String],
       listener: Expr[RecorderListener[A, R]]): Expr[R] = {
-    val termArg: Term = Term.of(recording).underlyingArgument
+    val termArg: Term = recording.asTerm.underlyingArgument
 
     '{
       val recorderRuntime: RecorderRuntime[A, R] = new RecorderRuntime($listener)
       recorderRuntime.recordMessage($message)
       ${
         Block(
-          recordExpressions(Term.of('{ recorderRuntime }), termArg),
-          Term.of('{ recorderRuntime.completeRecording() })
+          recordExpressions('{ recorderRuntime }.asTerm, termArg),
+          '{ recorderRuntime.completeRecording() }.asTerm
         ).asExprOf[R]
       }
     }
@@ -46,17 +46,17 @@ class RecorderMacro(using qctx0: Quotes) {
       found: Expr[A],
       message: Expr[String],
       listener: Expr[RecorderListener[A, R]]): Expr[R] = {
-    val expectedArg: Term = Term.of(expected).underlyingArgument
-    val foundArg: Term = Term.of(found).underlyingArgument
+    val expectedArg: Term = expected.asTerm.underlyingArgument
+    val foundArg: Term = found.asTerm.underlyingArgument
 
     '{
       val recorderRuntime: RecorderRuntime[A, R] = new RecorderRuntime($listener)
       recorderRuntime.recordMessage($message)
       ${
         Block(
-          recordExpressions(Term.of('{ recorderRuntime }), expectedArg) :::
-          recordExpressions(Term.of('{ recorderRuntime }), foundArg),
-          Term.of('{ recorderRuntime.completeRecording() })
+          recordExpressions('{ recorderRuntime }.asTerm, expectedArg) :::
+          recordExpressions('{ recorderRuntime }.asTerm, foundArg),
+          '{ recorderRuntime.completeRecording() }.asTerm
         ).asExprOf[R]
       }
     }
@@ -64,10 +64,10 @@ class RecorderMacro(using qctx0: Quotes) {
 
   private[this] def recordExpressions(runtime: Term, recording: Term): List[Term] = {
     val source = getSourceCode(recording)
-    val ast = recording.showExtractors
+    val ast = recording.show(using Printer.TreeStructure)
 
     val resetValuesSel: Term = {
-      val m = runtimeSym.method("resetValues").head
+      val m = runtimeSym.memberMethod("resetValues").head
       runtime.select(m)
     }
     try {
@@ -85,13 +85,13 @@ class RecorderMacro(using qctx0: Quotes) {
   private[this] def recordExpression(runtime: Term, source: String, ast: String, expr: Term): Term = {
     val instrumented = recordAllValues(runtime, expr)
     val recordExpressionSel: Term = {
-      val m = runtimeSym.method("recordExpression").head
+      val m = runtimeSym.memberMethod("recordExpression").head
       runtime.select(m)
     }
     Apply(recordExpressionSel,
       List(
-        Literal(Constant.String(source)),
-        Literal(Constant.String(ast)),
+        Literal(StringConstant(source)),
+        Literal(StringConstant(ast)),
         instrumented
       ))
   }
@@ -127,7 +127,7 @@ class RecorderMacro(using qctx0: Quotes) {
     // debug
     // println("recording " + expr.showExtractors + " at " + getAnchor(expr))
     val recordValueSel: Term = {
-      val m = runtimeSym.method("recordValue").head
+      val m = runtimeSym.memberMethod("recordValue").head
       runtime.select(m)
     }
     def skipIdent(sym: Symbol): Boolean =
@@ -156,7 +156,7 @@ class RecorderMacro(using qctx0: Quotes) {
           tapply,
           List(
             expr,
-            Literal(Constant.Int(getAnchor(expr)))
+            Literal(IntConstant(getAnchor(expr)))
           )
         )
     }
@@ -164,7 +164,7 @@ class RecorderMacro(using qctx0: Quotes) {
 
   private[this] def getSourceCode(expr: Tree): String = {
     val pos = expr.pos
-    (" " * pos.startColumn) + pos.sourceCode
+    (" " * pos.startColumn) + pos.sourceCode.get
   }
 
   private[this] def getAnchor(expr: Term): Int =
@@ -174,7 +174,7 @@ class RecorderMacro(using qctx0: Quotes) {
       case Apply(x, ys)     => getAnchor(x) + 0
       case TypeApply(x, ys) => getAnchor(x) + 0
       case Select(x, y)     =>
-        expr.pos.startColumn + math.max(0, expr.pos.sourceCode.indexOf(y))
+        expr.pos.startColumn + math.max(0, expr.pos.sourceCode.get.indexOf(y))
       case _                => expr.pos.startColumn
     }
 }
