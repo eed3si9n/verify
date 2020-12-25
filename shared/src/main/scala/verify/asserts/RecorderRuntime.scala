@@ -15,7 +15,7 @@ package asserts
 
 // one instance per recording
 class RecorderRuntime[A, R](listener: RecorderListener[A, R]) {
-  protected var recordedValues: List[RecordedValue] = List.empty
+  protected var recordedValues: List[RecordedValue[_]] = List.empty
   protected var recordedExprs: List[RecordedExpression[A]] = List.empty
   protected var recordedMessage: Function0[String] = () => ""
 
@@ -23,7 +23,7 @@ class RecorderRuntime[A, R](listener: RecorderListener[A, R]) {
     recordedValues = List.empty
   }
 
-  def recordValue[U](value: U, anchor: Int): U = {
+  def recordValue[U: Show](value: U, anchor: Int): U = {
     val recordedValue = RecordedValue(value, anchor)
     listener.valueRecorded(recordedValue)
     recordedValues = recordedValue :: recordedValues

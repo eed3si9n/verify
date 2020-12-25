@@ -12,6 +12,7 @@
 
 package example.asserttest
 
+import example.asserttest.Utils.outputs
 import verify._
 import verify.sourcecode.Compat.isDotty
 
@@ -19,12 +20,12 @@ object RenderingTest extends BasicTestSuite {
   test("literals") {
     outputs("""assertion failed
 
-"abc".length() == 2
-      |        |
-      3        false
+"abc".length == 2
+      |      |
+      3      false
     """) {
       assert {
-        "abc".length() == 2
+        "abc".length == 2
       }
     }
   }
@@ -381,28 +382,6 @@ and corrigible authority of this lies in our wills.                          |  
       """
       ) {
         assertEquals(str1, "virtue! " + str2)
-      }
-    }
-  }
-
-  def outputs(rendering: String)(expectation: => Unit): Unit = {
-    def normalize(s: String) = augmentString(s.trim()).linesIterator.toList.mkString
-
-    try {
-      expectation
-      fail("Expectation should have failed but didn't")
-    } catch {
-      case e: AssertionError => {
-        val expected = normalize(rendering)
-        val actual = normalize(e.getMessage)
-          .replaceAll("@[0-9a-f]*", "@\\.\\.\\.")
-          .replaceAll("\u001b\\[[\\d;]*[^\\d;]", "")
-        if (actual != expected) {
-          throw new AssertionError(s"""Expectation output doesn't match: ${e.getMessage}
-               |expected = $expected
-               |actual   = $actual
-               |""".stripMargin)
-        }
       }
     }
   }

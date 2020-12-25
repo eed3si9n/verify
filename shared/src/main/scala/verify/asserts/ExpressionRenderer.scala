@@ -24,7 +24,7 @@ class ExpressionRenderer(showTypes: Boolean, shortString: Boolean) {
 
     val rightToLeft = filterAndSortByAnchor(recordedExpr.recordedValues)
     for (recordedValue <- rightToLeft) {
-      placeValue(lines, recordedValue.value, math.max(recordedValue.anchor - offset, 0))
+      placeValue(lines, recordedValue, math.max(recordedValue.anchor - offset, 0))
     }
 
     lines.prepend(intro)
@@ -39,8 +39,8 @@ class ExpressionRenderer(showTypes: Boolean, shortString: Boolean) {
     lines.mkString("\n")
   }
 
-  private[this] def filterAndSortByAnchor(recordedValues: List[RecordedValue]): Iterable[RecordedValue] = {
-    var map = TreeMap[Int, RecordedValue]()(Ordering.by(-_))
+  private[this] def filterAndSortByAnchor(recordedValues: List[RecordedValue[_]]): Iterable[RecordedValue[_]] = {
+    var map = TreeMap[Int, RecordedValue[_]]()(Ordering.by(-_))
     // values stemming from compiler generated code often have the same anchor as regular values
     // and get recorded before them; let's filter them out
     for { value <- recordedValues } {
@@ -49,8 +49,8 @@ class ExpressionRenderer(showTypes: Boolean, shortString: Boolean) {
     map.values
   }
 
-  private[this] def placeValue(lines: ListBuffer[StringBuilder], value: Any, col: Int): Unit = {
-    val str = renderValue(value)
+  private[this] def placeValue[T](lines: ListBuffer[StringBuilder], recordedValue: RecordedValue[T], col: Int): Unit = {
+    val str = renderValue(recordedValue)
 
     placeString(lines(0), "|", col)
 
@@ -70,14 +70,14 @@ class ExpressionRenderer(showTypes: Boolean, shortString: Boolean) {
     }
   }
 
-  private[this] def renderValue(value: Any): String = {
-    val str0 = if (value == null) "null" else value.toString
-    val str =
-      if (!shortString) str0
-      else if (str0.contains("\n")) str0.linesIterator.toList.headOption.getOrElse("") + "..."
-      else str0
-    if (showTypes) str + " (" + value.getClass.getName + ")" // TODO: get type name the Scala way
-    else str
+  private[this] def renderValue[T](recordedValue: RecordedValue[T]): String = {
+    val strShow = recordedValue.showValue
+    val strShort =
+      if (!shortString) strShow
+      else if (strShow.contains("\n")) strShow.linesIterator.toList.headOption.getOrElse("") + "..."
+      else strShow
+    if (showTypes) strShort + " (" + recordedValue.value.getClass.getName + ")" // TODO: get type name the Scala way
+    else strShort
   }
 
   private[this] def placeString(line: StringBuilder, str: String, anchor: Int): Unit = {
