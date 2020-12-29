@@ -1,12 +1,9 @@
-scala-verify
-============
+Verify
+======
 
-scala-verify is a fork of [Minitest](https://github.com/monix/minitest) + [SourceCode](https://github.com/lihaoyi/sourcecode) to prepare for eventual merge into scala/scala.
-The purpose of scala-verify is to create a cross-platform, zero-dependency, minimal, testing framework for bootstrapping the toolchain and a small handful of foundational third-party libraries.
-See https://github.com/scala/scala-dev/issues/641.
+Verify is a minimalist unit testing framework, tracing its origins to [Minitest](https://github.com/monix/minitest) + [Expecty](https://github.com/eed3si9n/expecty) + [SourceCode](https://github.com/lihaoyi/sourcecode).
 
-A small testing framework cross-compiled for Scala 2.11, 2.12,
-2.13, Dotty, [Scala.js](http://www.scala-js.org/) 0.6 and 1.0, and
+It is a a small testing framework cross-compiled for Scala 2.11, 2.12, 2.13, Scala 3.x, [Scala.js](http://www.scala-js.org/) 0.6 and 1.0, and
 [Scala Native 0.3.x](https://www.scala-native.org/).
 
 ## Usage in sbt
@@ -15,7 +12,7 @@ For `build.sbt` (use the `%%%` operator for Scala.js):
 
 ```scala
 // use the %%% operator for Scala.js
-libraryDependencies += "com.eed3si9n.verify" %% "verify" % "0.2.0" % Test
+libraryDependencies += "com.eed3si9n.verify" %% "verify" % "1.0.0" % Test
 
 testFrameworks += new TestFramework("verify.runner.Framework")
 ```
@@ -146,6 +143,11 @@ object SomethingTest extends BasicTestSuite {
 ```
 
 That's all you need to know.
+
+## Historical background
+
+Verify started out as an attempt to create a cross-platform, zero-dependency, minimal, testing framework for bootstrapping the toolchain and a small handful of foundational third-party libraries.
+See https://github.com/scala/scala-dev/issues/641.
 
 ## License
 
