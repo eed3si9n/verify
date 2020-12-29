@@ -14,5 +14,6 @@ package verify
 package sourcecode
 
 object Compat {
-  def isDotty: Boolean = true
+  def isScala3: Boolean = true
+  def isDotty: Boolean = isScala3
 }
