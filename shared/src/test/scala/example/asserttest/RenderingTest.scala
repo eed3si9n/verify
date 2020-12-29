@@ -13,7 +13,7 @@
 package example.asserttest
 
 import verify._
-import verify.sourcecode.Compat.isDotty
+import verify.sourcecode.Compat.isScala3
 
 object RenderingTest extends BasicTestSuite {
   test("literals") {
@@ -22,7 +22,7 @@ object RenderingTest extends BasicTestSuite {
 "abc".length() == 2
       |        |
       3        false
-    """) {
+      """) {
       assert {
         "abc".length() == 2
       }
@@ -30,7 +30,7 @@ object RenderingTest extends BasicTestSuite {
   }
 
   test("List.apply") {
-    if (isDotty) {
+    if (isScala3) {
       outputs("""assertion failed
 
 List() == List(1, 2)
@@ -58,7 +58,7 @@ List() == List(1, 2)
   }
 
   test("List.apply2") {
-    if (isDotty) {
+    if (isScala3) {
       outputs("""assertion failed
 
 List(1, 2) == List()
@@ -239,7 +239,7 @@ Person(Fred,42)
     val brand = "BMW"
     val model = "M5"
 
-    if (isDotty) {
+    if (isScala3) {
       outputs("""assertion failed
 
 Car(brand, model).brand == "Audi"
@@ -266,8 +266,22 @@ BMW M5
     }
   }
 
+  test("method apply") {
+    outputs("""assertion failed
+
+something(0) == "something1"
+|            |
+something    false
+
+    """) {
+      assert {
+        something(0) == "something1"
+      }
+    }
+  }
+
   test("tuple") {
-    if (isDotty) {
+    if (isScala3) {
       outputs("""assertion failed
 
 (1, 2)._1 == 3
@@ -308,7 +322,7 @@ Some(23) |  Some(22)
 
   test("message") {
     val person = Person()
-    if (isDotty) {
+    if (isScala3) {
       outputs("""assertion failed: something something
 
 person.age == 43
@@ -346,7 +360,7 @@ assert(person.age == 43, "something something")
     |have it sterile with idleness, or manured with industry, why, the power
     |and corrigible authority of this lies in our wills.""".stripMargin
 
-    if (isDotty) {
+    if (isScala3) {
       outputs(
         """assertion failed: custom message
 
@@ -407,6 +421,8 @@ and corrigible authority of this lies in our wills.                          |  
     }
   }
 
+  def something(x: Int): String = "something"
+
   case class Person(name: String = "Fred", age: Int = 42) {
     def doIt() = "done"
     def sayTwice(word: String) = word * 2
@@ -417,4 +433,5 @@ and corrigible authority of this lies in our wills.                          |  
   case class Car(val brand: String, val model: String) {
     override def toString = brand + " " + model
   }
+
 }

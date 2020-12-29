@@ -26,5 +26,6 @@ object Compat {
     nearestEnclosingMethod(enclosingOwner(c)).asMethod.paramLists
   }
 
-  def isDotty: Boolean = false
+  def isScala3: Boolean = false
+  def isDotty: Boolean = isScala3
 }
