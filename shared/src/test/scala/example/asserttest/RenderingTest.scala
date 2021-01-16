@@ -30,56 +30,44 @@ object RenderingTest extends BasicTestSuite {
   }
 
   test("List.apply") {
-    if (isScala3) {
-      outputs("""assertion failed
-
-List() == List(1, 2)
-|      |  |
-List() |  List(1, 2)
-       false
-    """) {
-        assert {
-          List() == List(1, 2)
-        }
-      }
-    } else {
-      outputs("""assertion failed
+    val oldStr = """assertion failed
 
 List() == List(1, 2)
        |  |
        |  List(1, 2)
        false
-    """) {
-        assert {
-          List() == List(1, 2)
-        }
+    """
+    val newStr = """assertion failed
+
+List() == List(1, 2)
+|      |  |
+List() |  List(1, 2)
+       false
+    """
+    outputs(oldStr, newStr) {
+      assert {
+        List() == List(1, 2)
       }
     }
   }
 
   test("List.apply2") {
-    if (isScala3) {
-      outputs("""assertion failed
+    val oldStr = """assertion failed
+
+List(1, 2) == List()
+|          |
+List(1, 2) false
+    """
+    val newStr = """assertion failed
 
 List(1, 2) == List()
 |          |  |
 List(1, 2) |  List()
            false
-    """) {
-        assert {
-          List(1, 2) == List()
-        }
-      }
-    } else {
-      outputs("""assertion failed
-
-List(1, 2) == List()
-|          |
-List(1, 2) false
-    """) {
-        assert {
-          List(1, 2) == List()
-        }
+    """
+    outputs(oldStr, newStr) {
+      assert {
+        List(1, 2) == List()
       }
     }
   }
@@ -399,7 +387,7 @@ and corrigible authority of this lies in our wills.                          |  
     }
   }
 
-  def outputs(rendering: String)(expectation: => Unit): Unit = {
+  def outputs(renderings: String*)(expectation: => Unit): Unit = {
     def normalize(s: String) = augmentString(s.trim()).linesIterator.toList.mkString
 
     try {
@@ -407,13 +395,13 @@ and corrigible authority of this lies in our wills.                          |  
       fail("Expectation should have failed but didn't")
     } catch {
       case e: AssertionError => {
-        val expected = normalize(rendering)
+        val expected = renderings.map(normalize)
         val actual = normalize(e.getMessage)
           .replaceAll("@[0-9a-f]*", "@\\.\\.\\.")
           .replaceAll("\u001b\\[[\\d;]*[^\\d;]", "")
-        if (actual != expected) {
+        if (!expected.contains(actual)) {
           throw new AssertionError(s"""Expectation output doesn't match: ${e.getMessage}
-               |expected = $expected
+               |${expected.map(s => "expected = " + s).mkString("\n")}
                |actual   = $actual
                |""".stripMargin)
         }
