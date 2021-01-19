@@ -20,9 +20,18 @@ addCommandAlias("ci-all", ";+clean ;+test:compile ;+test ;+package")
 addCommandAlias("release", ";+clean ;+verifyNative/clean ;+publishSigned ;+verifyNative/publishSigned")
 
 val Scala211 = "2.11.12"
-val Scala212 = "2.12.11"
-val Scala213 = "2.13.3"
+val Scala212 = "2.12.13"
+val Scala213 = "2.13.4"
 val Scala3 = "3.0.0-M3"
+
+// Required until scalaNative 0.3.9/0.4.0-M2 are removed from the crossbuild
+val ScalaNativeSupportedVersions = 
+  Option(System.getenv("SCALANATIVE_VERSION")).getOrElse("0.3.9") match {
+    case "0.3.9"|"0.4.0-M2" =>
+      Seq(Scala211)
+    case _ =>
+      Seq(Scala211, Scala212, Scala213)
+  }
 
 ThisBuild / scalaVersion := Scala212
 
@@ -99,9 +108,14 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
     scalaJSStage in Test := FastOptStage
   )
   .nativeSettings(
-    libraryDependencies += "org.scala-native" %%% "test-interface" % nativeVersion,
+    libraryDependencies ++= Seq(
+      "org.scala-native" %%% "test-interface" % nativeVersion,
+      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.1" cross CrossVersion.full), // required for 0.3.9 support
+      "com.github.ghik" % "silencer-lib" % "1.7.1" % Provided cross CrossVersion.full // required for 0.3.9 support
+    ),
+    nativeLinkStubs := true, // required for 0.3.9 support
     scalaVersion := Scala211,
-    crossScalaVersions := Seq(Scala211),
+    crossScalaVersions := ScalaNativeSupportedVersions,
     publishConfiguration := publishConfiguration.value.withOverwrite(true),
     publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
   )

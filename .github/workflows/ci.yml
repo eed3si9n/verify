@@ -50,7 +50,8 @@ jobs:
             sudo apt-get update
             sudo apt install clang libunwind-dev libgc-dev libre2-dev
             sbt ++$SCALA211! verifyNative/test
-            env SCALANATIVE_VERSION="0.4.0-M2" sbt ++$SCALA211! verifyNative/test
+            env SCALANATIVE_VERSION="0.4.0-M2" sbt ++$SCALA211! verifyNative/clean verifyNative/test
+            env SCALANATIVE_VERSION="0.4.0" sbt +verifyNative/clean +verifyNative/test
             ;;
           *)
             echo unknown jobtype

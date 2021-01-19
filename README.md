@@ -3,15 +3,15 @@ Verify
 
 Verify is a minimalist unit testing framework, tracing its origins to [Minitest](https://github.com/monix/minitest) + [Expecty](https://github.com/eed3si9n/expecty) + [SourceCode](https://github.com/lihaoyi/sourcecode).
 
-It is a a small testing framework cross-compiled for Scala 2.11, 2.12, 2.13, Scala 3.x, [Scala.js](http://www.scala-js.org/) 0.6 and 1.0, and
-[Scala Native 0.3.x](https://www.scala-native.org/).
+It is a small testing framework cross-compiled for Scala 2.11, 2.12, 2.13, Scala 3.x, [Scala.js](http://www.scala-js.org/) 0.6 and 1.0, and
+[Scala Native](https://www.scala-native.org/) 0.3.x and 0.4.0.
 
 ## Usage in sbt
 
-For `build.sbt` (use the `%%%` operator for Scala.js):
+For `build.sbt` (use the `%%%` operator for Scala.js or Scala Native):
 
 ```scala
-// use the %%% operator for Scala.js
+// use the %%% operator for Scala.js or Scala Native
 libraryDependencies += "com.eed3si9n.verify" %% "verify" % "1.0.0" % Test
 
 testFrameworks += new TestFramework("verify.runner.Framework")
