@@ -24,15 +24,6 @@ val Scala212 = "2.12.13"
 val Scala213 = "2.13.4"
 val Scala3 = "3.0.0-M3"
 
-// Required until scalaNative 0.3.9/0.4.0-M2 are removed from the crossbuild
-val ScalaNativeSupportedVersions = 
-  Option(System.getenv("SCALANATIVE_VERSION")).getOrElse("0.3.9") match {
-    case "0.3.9"|"0.4.0-M2" =>
-      Seq(Scala211)
-    case _ =>
-      Seq(Scala211, Scala212, Scala213)
-  }
-
 ThisBuild / scalaVersion := Scala212
 
 ThisBuild / organization := "com.eed3si9n.verify"
@@ -115,7 +106,7 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
     ),
     nativeLinkStubs := true, // required for 0.3.9 support
     scalaVersion := Scala211,
-    crossScalaVersions := ScalaNativeSupportedVersions,
+    crossScalaVersions := Seq(Scala211, Scala212, Scala213),
     publishConfiguration := publishConfiguration.value.withOverwrite(true),
     publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
   )
