@@ -87,12 +87,12 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
       if (sv.startsWith("3."))
         // https://github.com/portable-scala/portable-scala-reflect/issues/23
         Seq(
-          "org.portable-scala" % "portable-scala-reflect_sjs1_2.13" % "1.0.0",
+          "org.portable-scala" % "portable-scala-reflect_sjs1_2.13" % "1.1.0",
           "org.scala-js" % "scalajs-test-interface_2.13" % scalaJSVersion
         )
       else
         Seq(
-          "org.portable-scala" %%% "portable-scala-reflect" % "1.0.0",
+          "org.portable-scala" %%% "portable-scala-reflect" % "1.1.0",
           "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
         )
     },
