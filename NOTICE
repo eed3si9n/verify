@@ -1,10 +1,15 @@
-Scala
-Copyright (c) 2002-2019 EPFL
-Copyright (c) 2011-2019 Lightbend, Inc.
+scala-verify
+Copyright (c) 2002-2021 EPFL
+Copyright (c) 2011-2021 Lightbend, Inc.
 
-Scala includes software developed at
+scala-verify includes software developed at
 LAMP/EPFL (https://lamp.epfl.ch/) and
 Lightbend, Inc. (https://www.lightbend.com/).
+
+scala-verify also includes code derived from:
+* Minitest (https://github.com/monix/minitest) (Apache 2.0 license)
+* Expecty (https://github.com/eed3si9n/expecty) (Apache 2.0 license)
+* SourceCode (https://github.com/lihaoyi/sourcecode) (MIT license)
 
 Licensed under the Apache License, Version 2.0 (the "License").
 Unless required by applicable law or agreed to in writing, software
@@ -12,5 +17,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-This software includes projects with other licenses -- see `doc/LICENSE.md`.
