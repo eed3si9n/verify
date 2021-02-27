@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  SCALA211: 2.11.12
+  SCALA211: 2.13.5
   SCALA212: 2.12.11
   SCALA213: 2.13.3
   SCALA3: 3.0.0-M3
