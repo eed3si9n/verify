@@ -27,17 +27,13 @@ class RecorderMacro(using qctx0: Quotes) {
       recording: Expr[A],
       message: Expr[String],
       listener: Expr[RecorderListener[A, R]]): Expr[R] = {
-    val termArg: Term = recording.asTerm.underlyingArgument // TODO remove use of underlyingArgument
+    val termArg = recording.asTerm.underlyingArgument.asExprOf[A] // TODO remove use of underlyingArgument
 
     '{
       val recorderRuntime: RecorderRuntime[A, R] = new RecorderRuntime($listener)
       recorderRuntime.recordMessage($message)
-      ${
-        Block(
-          recordExpressions('{ recorderRuntime }.asTerm, termArg),
-          '{ recorderRuntime.completeRecording() }.asTerm
-        ).asExprOf[R]
-      }
+      ${recordExpressions('recorderRuntime, termArg)}
+      recorderRuntime.completeRecording()
     }
   }
 
@@ -46,33 +42,22 @@ class RecorderMacro(using qctx0: Quotes) {
       found: Expr[A],
       message: Expr[String],
       listener: Expr[RecorderListener[A, R]]): Expr[R] = {
-    val expectedArg: Term = expected.asTerm
-    val foundArg: Term = found.asTerm
-
     '{
       val recorderRuntime: RecorderRuntime[A, R] = new RecorderRuntime($listener)
       recorderRuntime.recordMessage($message)
-      ${
-        Block(
-          recordExpressions('{ recorderRuntime }.asTerm, expectedArg) :::
-          recordExpressions('{ recorderRuntime }.asTerm, foundArg),
-          '{ recorderRuntime.completeRecording() }.asTerm
-        ).asExprOf[R]
-      }
+      ${recordExpressions('recorderRuntime, expected)}
+      ${recordExpressions('recorderRuntime, found)}
+      recorderRuntime.completeRecording()
     }
   }
 
-  private[this] def recordExpressions(runtime: Term, recording: Term): List[Term] = {
+  private[this] def recordExpressions[A: Type, R: Type](runtime: Expr[RecorderRuntime[A, R]], recording: Expr[A]): Expr[Any] = {
     val source = getSourceCode(recording)
-    val ast = recording.show(using Printer.TreeStructure)
+    val ast = recording.asTerm.show(using Printer.TreeStructure)
 
-    val resetValuesSel: Term = {
-      val m = runtimeSym.memberMethod("resetValues").head
-      runtime.select(m)
-    }
     try {
-      List(
-        Apply(resetValuesSel, List()),
+      Expr.block(
+        List('{ $runtime.resetValues() }),
         recordExpression(runtime, source, ast, recording)
       )
     } catch {
@@ -82,21 +67,14 @@ class RecorderMacro(using qctx0: Quotes) {
   }
 
   // emit recorderRuntime.recordExpression(<source>, <tree>, instrumented)
-  private[this] def recordExpression(runtime: Term, source: String, ast: String, expr: Term): Term = {
-    val instrumented = recordAllValues(runtime, expr)
-    val recordExpressionSel: Term = {
-      val m = runtimeSym.memberMethod("recordExpression").head
-      runtime.select(m)
-    }
-    Apply(recordExpressionSel,
-      List(
-        Literal(StringConstant(source)),
-        Literal(StringConstant(ast)),
-        instrumented
-      ))
+  private[this] def recordExpression[R: Type, A: Type](runtime: Expr[RecorderRuntime[A, R]], source: String, ast: String, expr: Expr[A]): Expr[Any] = {
+    val instrumented = recordAllValues(runtime, expr.asTerm).asExprOf[A]
+    val sourceExpr = Expr(source)
+    val astExpr = Expr(ast)
+    '{ $runtime.recordExpression($sourceExpr, $astExpr, $instrumented) }
   }
 
-  private[this] def recordAllValues(runtime: Term, expr: Term): Term =
+  private[this] def recordAllValues[R, A](runtime: Expr[RecorderRuntime[A, R]], expr: Term): Term =
     // TODO use an TreeMap or an ExprMap
     expr match {
       case New(_)     => expr
@@ -109,7 +87,7 @@ class RecorderMacro(using qctx0: Quotes) {
       case _ => recordValue(runtime, recordSubValues(runtime, expr), expr)
     }
 
-  private[this] def recordSubValues(runtime: Term, expr: Term): Term =
+  private[this] def recordSubValues[R, A](runtime: Expr[RecorderRuntime[A, R]], expr: Term): Term =
     expr match {
       case Apply(x, ys) =>
         try {
@@ -125,12 +103,12 @@ class RecorderMacro(using qctx0: Quotes) {
       case _                => expr
     }
 
-  private[this] def recordValue(runtime: Term, expr: Term, origExpr: Term): Term = {
+  private[this] def recordValue[R, A](runtime: Expr[RecorderRuntime[A, R]], expr: Term, origExpr: Term): Term = {
     // debug
     // println("recording " + expr.showExtractors + " at " + getAnchor(expr))
     val recordValueSel: Term = {
       val m = runtimeSym.memberMethod("recordValue").head
-      runtime.select(m)
+      runtime.asTerm.select(m)
     }
     def skipIdent(sym: Symbol): Boolean =
       sym.fullName match {
@@ -153,6 +131,9 @@ class RecorderMacro(using qctx0: Quotes) {
       case TypeApply(_, _) => expr
       case Ident(_) if skipIdent(expr.symbol) => expr
       case _ =>
+        // TODO:
+        // expr.asExpr match { case '{ $e: t } => '{ $runtime.recordValue[t]($e, ${Expr(getAnchor(expr))}) } }
+        // Then remove `runtimeSym`
         val tapply = recordValueSel.appliedToType(expr.tpe)
         Apply.copy(expr)(
           tapply,
@@ -164,8 +145,8 @@ class RecorderMacro(using qctx0: Quotes) {
     }
   }
 
-  private[this] def getSourceCode(expr: Tree): String = {
-    val pos = expr.pos
+  private[this] def getSourceCode(expr: Expr[Any]): String = {
+    val pos = expr.asTerm.pos
     (" " * pos.startColumn) + pos.sourceCode.get
   }
 
