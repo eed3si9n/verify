@@ -27,7 +27,7 @@ class RecorderMacro(using qctx0: Quotes) {
       recording: Expr[A],
       message: Expr[String],
       listener: Expr[RecorderListener[A, R]]): Expr[R] = {
-    val termArg: Term = recording.asTerm.underlyingArgument
+    val termArg: Term = recording.asTerm.underlyingArgument // TODO remove use of underlyingArgument
 
     '{
       val recorderRuntime: RecorderRuntime[A, R] = new RecorderRuntime($listener)
@@ -46,8 +46,8 @@ class RecorderMacro(using qctx0: Quotes) {
       found: Expr[A],
       message: Expr[String],
       listener: Expr[RecorderListener[A, R]]): Expr[R] = {
-    val expectedArg: Term = expected.asTerm.underlyingArgument
-    val foundArg: Term = found.asTerm.underlyingArgument
+    val expectedArg: Term = expected.asTerm
+    val foundArg: Term = found.asTerm
 
     '{
       val recorderRuntime: RecorderRuntime[A, R] = new RecorderRuntime($listener)
@@ -97,6 +97,7 @@ class RecorderMacro(using qctx0: Quotes) {
   }
 
   private[this] def recordAllValues(runtime: Term, expr: Term): Term =
+    // TODO use an TreeMap or an ExprMap
     expr match {
       case New(_)     => expr
       case Literal(_) => expr
@@ -104,6 +105,7 @@ class RecorderMacro(using qctx0: Quotes) {
       // don't record value of implicit "this" added by compiler; couldn't find a better way to detect implicit "this" than via point
       case Select(x@This(_), y) if expr.pos.start == x.pos.start => expr
       // case x: Select if x.symbol.isModule => expr // don't try to record the value of packages
+      case Inlined(call, Nil, t) => Inlined.copy(expr)(call, Nil, recordAllValues(runtime, t))
       case _ => recordValue(runtime, recordSubValues(runtime, expr), expr)
     }
 
