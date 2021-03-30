@@ -96,7 +96,7 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
           "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
         )
     },
-    scalaJSStage in Test := FastOptStage
+    Test / scalaJSStage := FastOptStage
   )
   .nativeSettings(
     libraryDependencies ++= Seq(
@@ -118,8 +118,8 @@ lazy val verifyNative = verify.native
 def scalaPartV = Def.setting(CrossVersion partialVersion scalaVersion.value)
 lazy val crossVersionSharedSources: Seq[Setting[_]] =
   (Seq(Compile, Test).map { sc =>
-    (unmanagedSourceDirectories in sc) ++= {
-      (unmanagedSourceDirectories in sc).value.map { dir =>
+    (sc / unmanagedSourceDirectories) ++= {
+      (sc / unmanagedSourceDirectories).value.map { dir =>
         scalaPartV.value match {
           case Some((major, minor)) =>
             new File(dir.getPath + s"_$major.$minor")
@@ -165,7 +165,7 @@ lazy val scalaTwoTwelveDeprecatedOptions =
   )
 
 lazy val sharedSettings = Seq(
-  scalacOptions in ThisBuild ++= Seq(
+  ThisBuild / scalacOptions ++= Seq(
     // Note, this is used by the doc-source-url feature to determine the
     // relative path of a given source file. If it's not a prefix of a the
     // absolute path of the source file, the absolute path of that file
