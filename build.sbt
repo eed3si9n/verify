@@ -22,7 +22,7 @@ addCommandAlias("release", ";+clean ;+verifyNative/clean ;+publishSigned ;+verif
 val Scala211 = "2.11.12"
 val Scala212 = "2.12.13"
 val Scala213 = "2.13.4"
-val Scala3 = "3.0.0-RC2"
+val Scala3 = "3.0.0"
 
 ThisBuild / scalaVersion := Scala212
 
@@ -84,7 +84,7 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
     crossScalaVersions := Seq(Scala211, Scala212, Scala213, Scala3),
     libraryDependencies ++= {
       val sv = scalaBinaryVersion.value
-      if (sv.startsWith("3."))
+      if (sv.startsWith("3"))
         // https://github.com/portable-scala/portable-scala-reflect/issues/23
         Seq(
           "org.portable-scala" % "portable-scala-reflect_sjs1_2.13" % "1.1.1",
