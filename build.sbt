@@ -20,7 +20,7 @@ addCommandAlias("ci-all", ";+clean ;+test:compile ;+test ;+package")
 addCommandAlias("release", ";+clean ;+verifyNative/clean ;+publishSigned ;+verifyNative/publishSigned")
 
 val Scala211 = "2.11.12"
-val Scala212 = "2.12.13"
+val Scala212 = "2.12.14"
 val Scala213 = "2.13.4"
 val Scala3 = "3.0.0"
 
@@ -101,8 +101,8 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
   .nativeSettings(
     libraryDependencies ++= Seq(
       "org.scala-native" %%% "test-interface" % nativeVersion,
-      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.1" cross CrossVersion.full), // required for 0.3.9 support
-      "com.github.ghik" % "silencer-lib" % "1.7.1" % Provided cross CrossVersion.full // required for 0.3.9 support
+      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.5" cross CrossVersion.full), // required for 0.3.9 support
+      "com.github.ghik" % "silencer-lib" % "1.7.5" % Provided cross CrossVersion.full // required for 0.3.9 support
     ),
     nativeLinkStubs := true, // required for 0.3.9 support
     scalaVersion := Scala211,
