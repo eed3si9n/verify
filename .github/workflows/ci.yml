@@ -1,4 +1,4 @@
-name: CI
+name: Test
 on:
   pull_request:
   push:
@@ -27,16 +27,20 @@ jobs:
           - os: ubuntu-latest
             java: 11
             jobtype: 1
+          - os: ubuntu-latest
+            java: 17
+            jobtype: 1
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Setup
-      uses: olafurpg/setup-scala@v10
+      uses: actions/setup-java@v2
       with:
-        java-version: "adopt@1.${{ matrix.java }}"
+        distribution: temurin
+        java-version: ${{matrix.java}}
     - name: Coursier cache
-      uses: coursier/cache-action@v5
+      uses: coursier/cache-action@v6
     - name: Build and test
       shell: bash
       run: |
@@ -55,8 +59,3 @@ jobs:
             echo unknown jobtype
             exit 1
         esac
-        rm -rf "$HOME/.ivy2/local"
-        find $HOME/Library/Caches/Coursier/v1        -name "ivydata-*.properties" -delete || true
-        find $HOME/.ivy2/cache                       -name "ivydata-*.properties" -delete || true
-        find $HOME/.cache/coursier/v1                -name "ivydata-*.properties" -delete || true
-        find $HOME/.sbt                              -name "*.lock"               -delete || true
