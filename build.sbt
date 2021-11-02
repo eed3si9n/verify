@@ -102,9 +102,9 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
     libraryDependencies ++= Seq(
       "org.scala-native" %%% "test-interface" % nativeVersion,
       compilerPlugin(
-        "com.github.ghik" % "silencer-plugin" % "1.7.6" cross CrossVersion.full
+        "com.github.ghik" % "silencer-plugin" % "1.7.7" cross CrossVersion.full
       ), // required for 0.3.9 support
-      "com.github.ghik" % "silencer-lib" % "1.7.6" % Provided cross CrossVersion.full // required for 0.3.9 support
+      "com.github.ghik" % "silencer-lib" % "1.7.7" % Provided cross CrossVersion.full // required for 0.3.9 support
     ),
     nativeLinkStubs := true, // required for 0.3.9 support
     scalaVersion := Scala211,
