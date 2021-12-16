@@ -47,7 +47,6 @@ jobs:
         case ${{ matrix.jobtype }} in
           1)
             sbt -v ++$SCALA211! verifyJVM/test ++$SCALA212! verifyJVM/test ++$SCALA213! verifyJVM/test ++$SCALA3! verifyJVM/test
-            # env SCALAJS_VERSION=0.6.33 sbt +verifyJS/test
             sbt +verifyJS/test
             ;;
           2)
