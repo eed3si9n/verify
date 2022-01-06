@@ -45,7 +45,7 @@ object Framework {
    * of type [[verify.AbstractTestSuite]].
    */
   object ModuleFingerprint extends SubclassFingerprint {
-    val isModule = true
+    def isModule() = true
     def requireNoArgConstructor(): Boolean = true
     def superclassName(): String = "verify.AbstractTestSuite"
   }

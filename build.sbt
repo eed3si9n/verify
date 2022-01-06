@@ -48,7 +48,7 @@ ThisBuild / headerLicense := Some(
 val ReleaseTag = """^v(\d+\.\d+\.\d+(?:[-.]\w+)?)$""".r
 
 lazy val verifyRoot = (project in file("."))
-  .aggregate(verifyJVM, verifyJS)
+  .aggregate(verifyJVM, verifyJS, verifyNative)
   .settings(
     name := "verify root",
     Compile / sources := Nil,
@@ -77,9 +77,6 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
     crossScalaVersions := Seq(Scala211, Scala212, Scala213, Scala3),
     libraryDependencies += "org.scala-sbt" % "test-interface" % "1.0"
   )
-  .platformsSettings(NativePlatform)(
-    libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.0.0" % Provided
-  )
   .jsSettings(
     crossScalaVersions := Seq(Scala211, Scala212, Scala213, Scala3),
     libraryDependencies ++= {
@@ -100,15 +97,29 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
   )
   .nativeSettings(
     libraryDependencies ++= Seq(
-      "org.scala-native" %%% "test-interface" % nativeVersion,
-      compilerPlugin(
-        "com.github.ghik" % "silencer-plugin" % "1.7.7" cross CrossVersion.full
-      ), // required for 0.3.9 support
-      "com.github.ghik" % "silencer-lib" % "1.7.7" % Provided cross CrossVersion.full // required for 0.3.9 support
+      "org.scala-native" %%% "test-interface" % nativeVersion
     ),
+    libraryDependencies ++= {
+      if (scalaBinaryVersion.value != "3") {
+        Seq(
+          compilerPlugin(
+            "com.github.ghik" % "silencer-plugin" % "1.7.7" cross CrossVersion.full
+          )
+        )
+      } else {
+        Nil
+      }
+    },
+    libraryDependencies += {
+      if (scalaBinaryVersion.value == "3") {
+        "com.github.ghik" % "silencer-lib_2.13.7" % "1.7.7" % Provided
+      } else {
+        "com.github.ghik" % "silencer-lib" % "1.7.7" % Provided cross CrossVersion.full // required for 0.3.9 support
+      }
+    },
     nativeLinkStubs := true, // required for 0.3.9 support
     scalaVersion := Scala211,
-    crossScalaVersions := Seq(Scala211, Scala212, Scala213),
+    crossScalaVersions := Seq(Scala211, Scala212, Scala213, "3.1.0"),
     publishConfiguration := publishConfiguration.value.withOverwrite(true),
     publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
   )
