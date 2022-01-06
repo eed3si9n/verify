@@ -17,11 +17,13 @@ import scala.concurrent.ExecutionContext
 
 final class Runner(
     val args: Array[String],
-    val remoteArgs: Array[String],
+    remoteArgs0: Array[String],
     val options: Options,
     val ec: ExecutionContext,
     classLoader: ClassLoader
 ) extends BaseRunner {
+
+  override def remoteArgs(): Array[String] = remoteArgs0
 
   def done(): String = ""
 
