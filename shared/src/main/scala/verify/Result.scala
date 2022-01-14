@@ -125,15 +125,14 @@ object Result {
       prefix: String
   ): String = {
 
-    val lines = message.split("\\r?\\n").zipWithIndex.map {
-      case (line, index) =>
-        if (index == 0)
-          color + prefix + line +
-            location.fold("")(l => s" (${l.fileName}:${l.line})") +
-            reset +
-            EOL
-        else
-          color + prefix + line + reset + EOL
+    val lines = message.split("\\r?\\n").zipWithIndex.map { case (line, index) =>
+      if (index == 0)
+        color + prefix + line +
+          location.fold("")(l => s" (${l.fileName}:${l.line})") +
+          reset +
+          EOL
+      else
+        color + prefix + line + reset + EOL
     }
 
     lines.mkString

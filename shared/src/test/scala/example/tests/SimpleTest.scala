@@ -92,13 +92,14 @@ object SimpleTest extends BasicTestSuite {
 
   test("fail(reason)") {
     def x = 1
-    val isSuccess = try {
-      if (x == 1) fail("dummy")
-      false
-    } catch {
-      case ex: AssertionError =>
-        ex.getMessage == "dummy"
-    }
+    val isSuccess =
+      try {
+        if (x == 1) fail("dummy")
+        false
+      } catch {
+        case ex: AssertionError =>
+          ex.getMessage == "dummy"
+      }
 
     assert(isSuccess)
   }

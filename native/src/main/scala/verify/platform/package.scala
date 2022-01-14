@@ -21,14 +21,14 @@ package object platform {
   val defaultExecutionContext: ExecutionContext = ExecutionContext.global
 
   // Deprecated in 0.4.0, required for 0.3.9 support
-  @silent("deprecated") 
+  @silent("deprecated")
   type EnableReflectiveInstantiation =
     scala.scalajs.reflect.annotation.EnableReflectiveInstantiation
 
   // Deprecated in 0.4.0, required for 0.3.9 support
   // Unfortunately, the TestUtils semantics changed from 0.3.9 to 0.4.0, so we need to try both names
-  @silent("deprecated") 
+  @silent("deprecated")
   private[verify] def loadModule(name: String, loader: ClassLoader): Any =
     Try(TestUtils.loadModule(name, loader)).getOrElse(TestUtils.loadModule(name + "$", loader))
-    
+
 }
