@@ -25,7 +25,8 @@ case class TestSpec[I, +O](name: String, f: I => Future[Result[O]]) extends (I =
 object TestSpec {
   def async[Env](name: String, cb: Env => Future[Unit])(implicit ec: ExecutionContext): TestSpec[Env, Unit] =
     TestSpec(
-      name, { env =>
+      name,
+      { env =>
         val f: Future[Unit] =
           try cb(env)
           catch { case NonFatal(ex) => Future.failed(ex) }
@@ -43,7 +44,8 @@ object TestSpec {
 
   def sync[Env](name: String, cb: Env => Void): TestSpec[Env, Unit] =
     TestSpec(
-      name, { env =>
+      name,
+      { env =>
         try {
           cb(env) match {
             case Void.UnitRef =>

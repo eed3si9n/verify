@@ -26,13 +26,14 @@ class RecorderMacro(using qctx0: Quotes) {
   def apply[A: Type, R: Type](
       recording: Expr[A],
       message: Expr[String],
-      listener: Expr[RecorderListener[A, R]]): Expr[R] = {
+      listener: Expr[RecorderListener[A, R]]
+  ): Expr[R] = {
     val termArg = recording.asTerm.underlyingArgument.asExprOf[A] // TODO remove use of underlyingArgument
 
     '{
       val recorderRuntime: RecorderRuntime[A, R] = new RecorderRuntime($listener)
       recorderRuntime.recordMessage($message)
-      ${recordExpressions('recorderRuntime, termArg)}
+      ${ recordExpressions('recorderRuntime, termArg) }
       recorderRuntime.completeRecording()
     }
   }
@@ -41,17 +42,21 @@ class RecorderMacro(using qctx0: Quotes) {
       expected: Expr[A],
       found: Expr[A],
       message: Expr[String],
-      listener: Expr[RecorderListener[A, R]]): Expr[R] = {
+      listener: Expr[RecorderListener[A, R]]
+  ): Expr[R] = {
     '{
       val recorderRuntime: RecorderRuntime[A, R] = new RecorderRuntime($listener)
       recorderRuntime.recordMessage($message)
-      ${recordExpressions('recorderRuntime, expected)}
-      ${recordExpressions('recorderRuntime, found)}
+      ${ recordExpressions('recorderRuntime, expected) }
+      ${ recordExpressions('recorderRuntime, found) }
       recorderRuntime.completeRecording()
     }
   }
 
-  private[this] def recordExpressions[A: Type, R: Type](runtime: Expr[RecorderRuntime[A, R]], recording: Expr[A]): Expr[Any] = {
+  private[this] def recordExpressions[A: Type, R: Type](
+      runtime: Expr[RecorderRuntime[A, R]],
+      recording: Expr[A]
+  ): Expr[Any] = {
     val source = getSourceCode(recording)
     val ast = recording.asTerm.show(using Printer.TreeStructure)
 
@@ -61,13 +66,18 @@ class RecorderMacro(using qctx0: Quotes) {
         recordExpression(runtime, source, ast, recording)
       )
     } catch {
-      case e: Throwable => throw new RuntimeException(
-        "Expecty: Error rewriting expression.\nText: " + source + "\nAST : " + ast, e)
+      case e: Throwable =>
+        throw new RuntimeException("Expecty: Error rewriting expression.\nText: " + source + "\nAST : " + ast, e)
     }
   }
 
   // emit recorderRuntime.recordExpression(<source>, <tree>, instrumented)
-  private[this] def recordExpression[R: Type, A: Type](runtime: Expr[RecorderRuntime[A, R]], source: String, ast: String, expr: Expr[A]): Expr[Any] = {
+  private[this] def recordExpression[R: Type, A: Type](
+      runtime: Expr[RecorderRuntime[A, R]],
+      source: String,
+      ast: String,
+      expr: Expr[A]
+  ): Expr[Any] = {
     val instrumented = recordAllValues(runtime, expr.asTerm).asExprOf[A]
     val sourceExpr = Expr(source)
     val astExpr = Expr(ast)
@@ -77,14 +87,14 @@ class RecorderMacro(using qctx0: Quotes) {
   private[this] def recordAllValues[R, A](runtime: Expr[RecorderRuntime[A, R]], expr: Term): Term =
     // TODO use an TreeMap or an ExprMap
     expr match {
-      case New(_)     => expr
-      case Literal(_) => expr
+      case New(_)                          => expr
+      case Literal(_)                      => expr
       case Typed(r @ Repeated(xs, y), tpe) => Typed.copy(r)(recordSubValues(runtime, r), tpe)
       // don't record value of implicit "this" added by compiler; couldn't find a better way to detect implicit "this" than via point
-      case Select(x@This(_), y) if expr.pos.start == x.pos.start => expr
+      case Select(x @ This(_), y) if expr.pos.start == x.pos.start => expr
       // case x: Select if x.symbol.isModule => expr // don't try to record the value of packages
       case Inlined(call, Nil, t) => Inlined.copy(expr)(call, Nil, recordAllValues(runtime, t))
-      case _ => recordValue(runtime, recordSubValues(runtime, expr), expr)
+      case _                     => recordValue(runtime, recordSubValues(runtime, expr), expr)
     }
 
   private[this] def recordSubValues[R, A](runtime: Expr[RecorderRuntime[A, R]], expr: Term): Term =
@@ -115,10 +125,10 @@ class RecorderMacro(using qctx0: Quotes) {
         case sym if sym.isDefDef => sym.signature.paramSigs.nonEmpty
         case _ =>
           sym.fullName match {
-            case "scala" | "java" => true
+            case "scala" | "java"                          => true
             case fullName if fullName.startsWith("scala.") => true
             case fullName if fullName.startsWith("java.")  => true
-            case _ => false
+            case _                                         => false
           }
       }
 
@@ -126,14 +136,14 @@ class RecorderMacro(using qctx0: Quotes) {
       (sym match {
         case sym if sym.isDefDef => skipIdent(sym)
         case sym if sym.isValDef => skipIdent(sym)
-        case _ => true
+        case _                   => true
       })
 
     expr match {
       case Select(_, _) if skipSelect(expr.symbol) => expr
-      case TypeApply(_, _) => expr
-      case Ident(_) if skipIdent(expr.symbol) => expr
-      case _ =>
+      case TypeApply(_, _)                         => expr
+      case Ident(_) if skipIdent(expr.symbol)      => expr
+      case _                                       =>
         // TODO:
         // expr.asExpr match { case '{ $e: t } => '{ $runtime.recordValue[t]($e, ${Expr(getAnchor(expr))}) } }
         // Then remove `runtimeSym`
@@ -159,39 +169,37 @@ class RecorderMacro(using qctx0: Quotes) {
         getAnchor(ys.head)
       case Apply(x, ys)     => getAnchor(x) + 0
       case TypeApply(x, ys) => getAnchor(x) + 0
-      case Select(x, y)     =>
+      case Select(x, y) =>
         expr.pos.startColumn + math.max(0, expr.pos.sourceCode.get.indexOf(y))
-      case _                => expr.pos.startColumn
+      case _ => expr.pos.startColumn
     }
 }
 
 object RecorderMacro {
-  def apply[A: Type, R: Type](
-      recording: Expr[A],
-      listener: Expr[RecorderListener[A, R]])(using qctx: Quotes): Expr[R] =
-    new RecorderMacro().apply(recording, '{""}, listener)
+  def apply[A: Type, R: Type](recording: Expr[A], listener: Expr[RecorderListener[A, R]])(using qctx: Quotes): Expr[R] =
+    new RecorderMacro().apply(recording, '{ "" }, listener)
 
   /** captures a method invocation in the shape of assert(expr, message). */
-  def apply[A: Type, R: Type](
-      recording: Expr[A],
-      message: Expr[String],
-      listener: Expr[RecorderListener[A, R]])(using qctx: Quotes): Expr[R] =
+  def apply[A: Type, R: Type](recording: Expr[A], message: Expr[String], listener: Expr[RecorderListener[A, R]])(using
+      qctx: Quotes
+  ): Expr[R] =
     new RecorderMacro().apply(recording, message, listener)
 }
 
 object StringRecorderMacro {
+
   /** captures a method invocation in the shape of assertEquals(expected, found). */
-  def apply[R: Type](
-      expected: Expr[String],
-      found: Expr[String],
-      listener: Expr[RecorderListener[String, R]])(using qctx: Quotes): Expr[R] =
-    new RecorderMacro().apply2[String, R](expected, found, '{""}, listener)
+  def apply[R: Type](expected: Expr[String], found: Expr[String], listener: Expr[RecorderListener[String, R]])(using
+      qctx: Quotes
+  ): Expr[R] =
+    new RecorderMacro().apply2[String, R](expected, found, '{ "" }, listener)
 
   /** captures a method invocation in the shape of assertEquals(expected, found). */
   def apply[R: Type](
       expected: Expr[String],
       found: Expr[String],
       message: Expr[String],
-      listener: Expr[RecorderListener[String, R]])(using qctx: Quotes): Expr[R] =
+      listener: Expr[RecorderListener[String, R]]
+  )(using qctx: Quotes): Expr[R] =
     new RecorderMacro().apply2[String, R](expected, found, message, listener)
 }

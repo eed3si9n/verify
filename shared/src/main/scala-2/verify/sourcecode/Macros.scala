@@ -150,12 +150,11 @@ object Macros {
   def text[T: c.WeakTypeTag](c: Compat.Context)(v: c.Expr[T]): c.Expr[sourcecode.Text[T]] = {
     import c.universe._
     val fileContent = new String(v.tree.pos.source.content)
-    val start = v.tree.collect {
-      case treeVal =>
-        treeVal.pos match {
-          case NoPosition => Int.MaxValue
-          case p          => p.start
-        }
+    val start = v.tree.collect { case treeVal =>
+      treeVal.pos match {
+        case NoPosition => Int.MaxValue
+        case p          => p.start
+      }
     }.min
     import scala.language.existentials
     val g = c.asInstanceOf[reflect.macros.runtime.Context].global
@@ -196,8 +195,8 @@ object Macros {
           case x if x.isTerm && x.asTerm.isVar     => Chunk.Var
           case x if x.isTerm && x.asTerm.isLazy    => Chunk.Lzy
           case x if x.isTerm && x.asTerm.isVal     => Chunk.Val
-          case _                                   =>
-            throw new Exception("Unexpected chunk symbol:" + current) 
+          case _ =>
+            throw new Exception("Unexpected chunk symbol:" + current)
         }
 
         path = chunk(Util.getName(c)(current)) :: path

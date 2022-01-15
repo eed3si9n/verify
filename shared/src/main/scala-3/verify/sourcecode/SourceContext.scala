@@ -10,14 +10,13 @@
  * additional information regarding copyright ownership.
  */
 
-
 package verify
 package sourcecode
 
-private[sourcecode] trait SourceValue[T]{
+private[sourcecode] trait SourceValue[T] {
   def value: T
 }
-private[sourcecode] trait SourceCompanion[T, V <: SourceValue[T]](build: T => V){
+private[sourcecode] trait SourceCompanion[T, V <: SourceValue[T]](build: T => V) {
   def apply()(using V): T = summon[V].value
 }
 
@@ -45,7 +44,11 @@ object Line extends LineMacros with SourceCompanion[Int, Line](new Line(_))
 case class SourceLocation(fileName: String, filePath: String, line: Int)
 object SourceLocation {
   import scala.language.implicitConversions
-  implicit def toScalaVerifySourcecodeSourceLocation(implicit n: SourceFileName, p: SourceFilePath, l: Line): SourceLocation =
+  implicit def toScalaVerifySourcecodeSourceLocation(implicit
+      n: SourceFileName,
+      p: SourceFilePath,
+      l: Line
+  ): SourceLocation =
     SourceLocation(n.value, p.value, l.value)
 
   def apply()(using SourceLocation): SourceLocation = summon[SourceLocation]
@@ -66,4 +69,4 @@ object Text extends TextMacros
 /*
 case class Args(value: Seq[Seq[Text[_]]]) extends SourceValue[Seq[Seq[Text[_]]]]
 object Args extends ArgsMacros with SourceCompanion[Seq[Seq[Text[_]]], Args](new Args(_))
-*/
+ */

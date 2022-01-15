@@ -28,14 +28,16 @@ case class Properties[I](
   def iterator: Iterator[TestSpec[Unit, Unit]] = {
     for (property <- properties.iterator)
       yield TestSpec[Unit, Unit](
-        property.name, { _ =>
+        property.name,
+        { _ =>
           try {
             val env = setup()
-            val result = try property(env)
-            catch {
-              case NonFatal(ex) =>
-                Future.successful(Result.from(ex))
-            }
+            val result =
+              try property(env)
+              catch {
+                case NonFatal(ex) =>
+                  Future.successful(Result.from(ex))
+              }
 
             result.flatMap {
               case Result.Success(_) =>

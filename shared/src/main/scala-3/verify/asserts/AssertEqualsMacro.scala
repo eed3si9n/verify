@@ -22,4 +22,4 @@ trait AssertEquals[R] {
 
   inline def assertEquals(inline expected: String, inline found: String, message: => String): R =
     ${ StringRecorderMacro.apply('expected, 'found, 'message, 'stringAssertEqualsListener) }
-  }
+}
