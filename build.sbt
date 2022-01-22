@@ -23,6 +23,7 @@ val Scala211 = "2.11.12"
 val Scala212 = "2.12.15"
 val Scala213 = "2.13.8"
 val Scala3 = "3.0.2"
+val Scala31 = "3.1.1"
 
 ThisBuild / scalaVersion := Scala212
 
@@ -119,7 +120,7 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
     },
     nativeLinkStubs := true, // required for 0.3.9 support
     scalaVersion := Scala211,
-    crossScalaVersions := Seq(Scala211, Scala212, Scala213, "3.1.0"),
+    crossScalaVersions := Seq(Scala211, Scala212, Scala213, Scala31),
     publishConfiguration := publishConfiguration.value.withOverwrite(true),
     publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
   )
