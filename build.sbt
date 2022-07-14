@@ -20,10 +20,10 @@ addCommandAlias("ci-all", ";+clean ;+test:compile ;+test ;+package")
 addCommandAlias("release", ";+clean ;+verifyNative/clean ;+publishSigned ;+verifyNative/publishSigned")
 
 val Scala211 = "2.11.12"
-val Scala212 = "2.12.15"
+val Scala212 = "2.12.16"
 val Scala213 = "2.13.8"
 val Scala3 = "3.0.2"
-val Scala31 = "3.1.2"
+val Scala31 = "3.1.3"
 
 ThisBuild / scalaVersion := Scala212
 
@@ -104,7 +104,7 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
       if (scalaBinaryVersion.value != "3") {
         Seq(
           compilerPlugin(
-            "com.github.ghik" % "silencer-plugin" % "1.7.8" cross CrossVersion.full
+            "com.github.ghik" % "silencer-plugin" % "1.7.9" cross CrossVersion.full
           )
         )
       } else {
@@ -113,9 +113,9 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
     },
     libraryDependencies += {
       if (scalaBinaryVersion.value == "3") {
-        "com.github.ghik" % "silencer-lib_2.13.7" % "1.7.8" % Provided
+        "com.github.ghik" % "silencer-lib_2.13.7" % "1.7.9" % Provided
       } else {
-        "com.github.ghik" % "silencer-lib" % "1.7.8" % Provided cross CrossVersion.full // required for 0.3.9 support
+        "com.github.ghik" % "silencer-lib" % "1.7.9" % Provided cross CrossVersion.full // required for 0.3.9 support
       }
     },
     nativeLinkStubs := true, // required for 0.3.9 support
