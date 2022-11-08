@@ -22,8 +22,8 @@ addCommandAlias("release", ";+clean ;+verifyNative/clean ;+publishSigned ;+verif
 val Scala211 = "2.11.12"
 val Scala212 = "2.12.16"
 val Scala213 = "2.13.8"
-val Scala3 = "3.1.3"
-val Scala31 = "3.1.3"
+val Scala3 = "3.2.1"
+val Scala31 = "3.2.1"
 
 ThisBuild / scalaVersion := Scala212
 
