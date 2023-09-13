@@ -104,7 +104,7 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
       if (scalaBinaryVersion.value != "3") {
         Seq(
           compilerPlugin(
-            "com.github.ghik" % "silencer-plugin" % "1.7.9" cross CrossVersion.full
+            "com.github.ghik" % "silencer-plugin" % "1.7.14" cross CrossVersion.full
           )
         )
       } else {
@@ -113,9 +113,9 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
     },
     libraryDependencies += {
       if (scalaBinaryVersion.value == "3") {
-        "com.github.ghik" % "silencer-lib_2.13.7" % "1.7.9" % Provided
+        "com.github.ghik" % "silencer-lib_2.13.7" % "1.7.14" % Provided
       } else {
-        "com.github.ghik" % "silencer-lib" % "1.7.9" % Provided cross CrossVersion.full // required for 0.3.9 support
+        "com.github.ghik" % "silencer-lib" % "1.7.14" % Provided cross CrossVersion.full // required for 0.3.9 support
       }
     },
     nativeLinkStubs := true, // required for 0.3.9 support
