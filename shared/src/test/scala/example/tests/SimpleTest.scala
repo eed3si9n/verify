@@ -67,7 +67,7 @@ object SimpleTest extends BasicTestSuite {
   }
 
   testAsync("asynchronous test") {
-    import scala.concurrent.ExecutionContext.Implicits.global
+    implicit val ec = verify.platform.defaultExecutionContext
 
     Future(1).map(_ + 1).map { result =>
       assert(result == 2)
