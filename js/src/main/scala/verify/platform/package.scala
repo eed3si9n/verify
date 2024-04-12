@@ -22,7 +22,7 @@ import scala.concurrent.ExecutionContext
  */
 package object platform {
   val Await = scala.concurrent.Await
-  val defaultExecutionContext: ExecutionContext = ExecutionContext.global
+  val defaultExecutionContext: ExecutionContext = scala.scalajs.concurrent.JSExecutionContext.queue
 
   type EnableReflectiveInstantiation =
     org.portablescala.reflect.annotation.EnableReflectiveInstantiation
