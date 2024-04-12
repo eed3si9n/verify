@@ -118,9 +118,7 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
         "com.github.ghik" % "silencer-lib" % "1.7.9" % Provided cross CrossVersion.full // required for 0.3.9 support
       }
     },
-    nativeLinkStubs := true, // required for 0.3.9 support
-    scalaVersion := Scala211,
-    crossScalaVersions := Seq(Scala211, Scala212, Scala213, Scala31),
+    crossScalaVersions := Seq(Scala212, Scala213, Scala31),
     publishConfiguration := publishConfiguration.value.withOverwrite(true),
     publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
   )
