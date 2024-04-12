@@ -34,7 +34,7 @@ object EnvironmentTest extends TestSuite[Int] {
   }
 
   testAsync("asynchronous test") { env =>
-    import scala.concurrent.ExecutionContext.Implicits.global
+    implicit val ec = verify.platform.defaultExecutionContext
 
     Future(env).map(_ + 1).map { result =>
       assert(result == env + 1)
