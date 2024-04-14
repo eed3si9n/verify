@@ -104,7 +104,7 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
       if (scalaBinaryVersion.value != "3") {
         Seq(
           compilerPlugin(
-            "com.github.ghik" % "silencer-plugin" % "1.7.9" cross CrossVersion.full
+            "com.github.ghik" % "silencer-plugin" % "1.7.16" cross CrossVersion.full
           )
         )
       } else {
@@ -113,14 +113,12 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
     },
     libraryDependencies += {
       if (scalaBinaryVersion.value == "3") {
-        "com.github.ghik" % "silencer-lib_2.13.7" % "1.7.9" % Provided
+        "com.github.ghik" % "silencer-lib_2.13.7" % "1.7.16" % Provided
       } else {
-        "com.github.ghik" % "silencer-lib" % "1.7.9" % Provided cross CrossVersion.full // required for 0.3.9 support
+        "com.github.ghik" % "silencer-lib" % "1.7.16" % Provided cross CrossVersion.full // required for 0.3.9 support
       }
     },
-    nativeLinkStubs := true, // required for 0.3.9 support
-    scalaVersion := Scala211,
-    crossScalaVersions := Seq(Scala211, Scala212, Scala213, Scala31),
+    crossScalaVersions := Seq(Scala212, Scala213, Scala31),
     publishConfiguration := publishConfiguration.value.withOverwrite(true),
     publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
   )
