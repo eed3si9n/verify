@@ -113,7 +113,7 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
     },
     libraryDependencies += {
       if (scalaBinaryVersion.value == "3") {
-        "com.github.ghik" % "silencer-lib_2.13.7" % "1.7.16" % Provided
+        "com.github.ghik" % "silencer-lib_2.13.7" % "1.17.13" % Provided
       } else {
         "com.github.ghik" % "silencer-lib" % "1.7.16" % Provided cross CrossVersion.full // required for 0.3.9 support
       }
