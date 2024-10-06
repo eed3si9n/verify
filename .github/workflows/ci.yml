@@ -7,7 +7,7 @@ env:
   SCALA211: 2.11.12
   SCALA212: 2.12.19
   SCALA213: 2.13.13
-  SCALA3: 3.1.3
+  SCALA3: 3.3.4
   # define Java options for both official sbt and sbt-extras
   JAVA_OPTS: -Xms2048M -Xmx2048M -Xss6M -XX:ReservedCodeCacheSize=256M -Dfile.encoding=UTF-8
   JVM_OPTS:  -Xms2048M -Xmx2048M -Xss6M -XX:ReservedCodeCacheSize=256M -Dfile.encoding=UTF-8
