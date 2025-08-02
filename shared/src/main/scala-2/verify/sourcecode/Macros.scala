@@ -195,7 +195,7 @@ object Macros {
           case x if x.isTerm && x.asTerm.isVar     => Chunk.Var
           case x if x.isTerm && x.asTerm.isLazy    => Chunk.Lzy
           case x if x.isTerm && x.asTerm.isVal     => Chunk.Val
-          case _ =>
+          case _                                   =>
             throw new Exception("Unexpected chunk symbol:" + current)
         }
 
