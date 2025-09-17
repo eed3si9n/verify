@@ -130,7 +130,7 @@ Instrumented AST: ${showRaw(instrumented)}")
     // don't record value of implicit "this" added by compiler; couldn't find a better way to detect implicit "this" than via point
     case Select(x @ This(_), y) if getPosition(expr).point == getPosition(x).point => expr
     case x: Select if x.symbol.isModule => expr // don't try to record the value of packages
-    case _ =>
+    case _                              =>
       recordValue(recordSubValues(expr), expr)
   }
 
@@ -154,7 +154,7 @@ Instrumented AST: ${showRaw(instrumented)}")
   private[this] def getAnchor(expr: Tree): Int = expr match {
     case Apply(x, ys)     => getAnchor(x) + 0
     case TypeApply(x, ys) => getAnchor(x) + 0
-    case _ => {
+    case _                => {
       val pos = getPosition(expr)
       pos.point - pos.source.lineToOffset(pos.line - 1)
     }
