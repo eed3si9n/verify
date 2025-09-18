@@ -123,7 +123,7 @@ class RecorderMacro(using qctx0: Quotes) {
     def skipIdent(sym: Symbol): Boolean =
       sym match {
         case sym if sym.isDefDef => sym.signature.paramSigs.nonEmpty
-        case _ =>
+        case _                   =>
           sym.fullName match {
             case "scala" | "java"                          => true
             case fullName if fullName.startsWith("scala.") => true
@@ -169,7 +169,7 @@ class RecorderMacro(using qctx0: Quotes) {
         getAnchor(ys.head)
       case Apply(x, ys)     => getAnchor(x) + 0
       case TypeApply(x, ys) => getAnchor(x) + 0
-      case Select(x, y) =>
+      case Select(x, y)     =>
         expr.pos.startColumn + math.max(0, expr.pos.sourceCode.get.indexOf(y))
       case _ => expr.pos.startColumn
     }
