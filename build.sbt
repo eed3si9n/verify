@@ -98,7 +98,7 @@ lazy val verify = (crossProject(JVMPlatform, JSPlatform, NativePlatform) in file
   )
   .nativeSettings(
     libraryDependencies ++= Seq(
-      "org.scala-native" %%% "test-interface" % nativeVersion
+      "org.scala-native" %%% "test-interface-sbt-defs" % nativeVersion
     ),
     libraryDependencies ++= {
       if (scalaBinaryVersion.value != "3") {
